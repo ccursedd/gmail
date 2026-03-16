@@ -1,15 +1,9 @@
-// api/webhook.js - Mailgun webhook receiver
-// Deploy this to Vercel. Set these env vars in Vercel dashboard:
-//   SUPABASE_URL=https://ylgtgecqhdhakzbjdkqq.supabase.co
-//   SUPABASE_SERVICE_KEY=your_service_role_key
-//   MAILGUN_WEBHOOK_SIGNING_KEY=your_webhook_signing_key
-
 import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const db = createClient(
   process.env.https://ylgtgecqhdhakzbjdkqq.supabase.co,
-  process.env.sb_publishable_ILF6pER_bdL8GppxOzfumg_xsDoMA6T
+  process.env.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsZ3RnZWNxaGRoYWt6Ympka3FxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTU0NDAwNCwiZXhwIjoyMDg3MTIwMDA0fQ.87ohTc61_HFVpRpdpVCuY73_zL3qMvi-b6-oBcndKec
 );
 
 function verifyMailgunSignature(signingKey, timestamp, token, signature) {
@@ -28,7 +22,6 @@ export default async function handler(req, res) {
   try {
     const body = req.body;
 
-    // Verify webhook signature if signing key is set
     if (process.env.445d9949d4e2b6d36db7eea3c3a73421) {
       const { timestamp, token, signature } = body.signature || {};
       if (!verifyMailgunSignature(process.env.445d9949d4e2b6d36db7eea3c3a73421, timestamp, token, signature)) {
@@ -43,7 +36,7 @@ export default async function handler(req, res) {
     const bodyText = eventData['body-plain'] || eventData['stripped-text'] || '';
     const bodyHtml = eventData['body-html'] || eventData['stripped-html'] || '';
     const messageId = eventData['Message-Id'] || eventData['message-id'] || crypto.randomUUID();
-    const timestamp = eventData.timestamp
+    const receivedAt = eventData.timestamp
       ? new Date(eventData.timestamp * 1000).toISOString()
       : new Date().toISOString();
 
@@ -60,7 +53,7 @@ export default async function handler(req, res) {
       body_text: bodyText,
       body_html: bodyHtml,
       message_id: messageId,
-      received_at: timestamp,
+      received_at: receivedAt,
       seen: false
     }]);
 
