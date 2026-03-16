@@ -2,8 +2,8 @@ import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const db = createClient(
-  process.env.https://ylgtgecqhdhakzbjdkqq.supabase.co,
-  process.env.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsZ3RnZWNxaGRoYWt6Ympka3FxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTU0NDAwNCwiZXhwIjoyMDg3MTIwMDA0fQ.87ohTc61_HFVpRpdpVCuY73_zL3qMvi-b6-oBcndKec
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 function verifyMailgunSignature(signingKey, timestamp, token, signature) {
@@ -22,9 +22,9 @@ export default async function handler(req, res) {
   try {
     const body = req.body;
 
-    if (process.env.445d9949d4e2b6d36db7eea3c3a73421) {
+    if (process.env.MAILGUN_WEBHOOK_SIGNING_KEY) {
       const { timestamp, token, signature } = body.signature || {};
-      if (!verifyMailgunSignature(process.env.445d9949d4e2b6d36db7eea3c3a73421, timestamp, token, signature)) {
+      if (!verifyMailgunSignature(process.env.MAILGUN_WEBHOOK_SIGNING_KEY, timestamp, token, signature)) {
         return res.status(401).json({ error: 'Invalid signature' });
       }
     }
