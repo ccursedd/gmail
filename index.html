@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DropMail — exiled.lat</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#060608;--s1:#0e0e14;--s2:#161620;--s3:#1e1e2c;
+  --b1:#252535;--b2:#353550;
+  --accent:#00e5a0;--accent-dim:rgba(0,229,160,0.1);--accent-mid:rgba(0,229,160,0.35);
+  --text:#e8e8f0;--muted:#6b6b88;--muted2:#9898b0;
+  --red:#ff4f6d;
+  --mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;flex-direction:column;min-height:100vh}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+
+header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;border-bottom:1px solid var(--b1);background:rgba(6,6,8,0.94);backdrop-filter:blur(16px)}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:1.2rem;font-weight:800;letter-spacing:-0.5px}
+.logo-dot{width:9px;height:9px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.logo em{font-style:normal;color:var(--accent)}
+.domain-badge{font-family:var(--mono);font-size:.7rem;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-mid);padding:3px 10px;border-radius:20px}
+.hdr-right{display:flex;align-items:center;gap:10px}
+#liveDot{width:6px;height:6px;background:var(--muted);border-radius:50%;transition:background .3s,box-shadow .3s}
+#liveDot.live{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+#liveLabel{font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+
+.layout{position:relative;z-index:1;flex:1;display:grid;grid-template-columns:320px 1fr;max-width:1080px;margin:0 auto;width:100%;padding:1.75rem 1.5rem;gap:1.25rem}
+
+.left{display:flex;flex-direction:column;gap:1rem}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:1.4rem}
+.card-label{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.7rem}
+
+.gen-wrap{display:flex;gap:8px;margin-bottom:.9rem}
+.gen-input{flex:1;background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:.7rem 1rem;font-family:var(--mono);font-size:.82rem;color:var(--accent);outline:none;transition:border-color .15s}
+.gen-input:focus{border-color:var(--accent-mid)}
+.gen-input::placeholder{color:var(--muted)}
+.domain-suffix{background:var(--bg);border:1px solid var(--b2);border-left:none;border-radius:0 8px 8px 0;padding:.7rem .9rem;font-family:var(--mono);font-size:.82rem;color:var(--muted);white-space:nowrap;margin-left:-4px;flex-shrink:0}
+
+.btn-row{display:flex;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:.6rem 1rem;border-radius:7px;font-family:var(--sans);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .14s;border:none;outline:none;white-space:nowrap}
+.btn-gen{background:var(--accent);color:#000;flex:1;justify-content:center}
+.btn-gen:hover{background:#00ffb3;transform:translateY(-1px)}
+.btn-gen:active{transform:translateY(0)}
+.btn-gen:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--b2)}
+.btn-ghost:hover{border-color:var(--accent-mid);color:var(--accent)}
+.btn-ghost:disabled{opacity:.3;cursor:not-allowed}
+.btn-ghost:disabled:hover{border-color:var(--b2);color:var(--muted2)}
+
+.cur-addr{background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:.8rem 1rem;margin-bottom:.9rem;min-height:48px;display:flex;align-items:center;gap:8px;position:relative;overflow:hidden}
+.cur-addr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .3s}
+.cur-addr.active::before{opacity:1}
+.cur-addr-text{font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all;flex:1}
+.cur-addr-text.ph{color:var(--muted);font-style:italic;font-size:.75rem}
+
+.status{font-family:var(--mono);font-size:.7rem;margin-top:.6rem;min-height:16px;color:var(--muted)}
+.status.ok{color:var(--accent)}.status.err{color:var(--red)}
+
+.hist-card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:1.25rem 1.4rem;flex:1;display:flex;flex-direction:column;overflow:hidden}
+.sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.sec-title{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.pill{background:var(--accent-dim);color:var(--accent);font-family:var(--mono);font-size:.62rem;padding:2px 9px;border-radius:20px;border:1px solid var(--accent-mid)}
+.hist-list{display:flex;flex-direction:column;gap:5px;overflow-y:auto;max-height:320px}
+.hist-list::-webkit-scrollbar{width:3px}.hist-list::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.hist-item{display:flex;align-items:center;gap:8px;padding:7px 9px;background:var(--bg);border:1px solid var(--b1);border-radius:7px;cursor:pointer;transition:border-color .13s}
+.hist-item:hover{border-color:var(--b2)}.hist-item.sel{border-color:var(--accent-mid);background:var(--accent-dim)}
+.hist-addr{flex:1;font-family:var(--mono);font-size:.72rem;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-item.sel .hist-addr{color:var(--accent)}
+.ha{display:flex;gap:4px}
+.ibtn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:3px 5px;border-radius:4px;font-size:12px;transition:color .13s}
+.ibtn:hover{color:var(--text)}.ibtn.del:hover{color:var(--red)}
+.empty-hist{text-align:center;padding:1.5rem;color:var(--muted);font-family:var(--mono);font-size:.75rem}
+
+.inbox-panel{display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;min-height:500px}
+.inbox-toolbar{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.4rem;border-bottom:1px solid var(--b1);background:var(--s2);gap:12px}
+.iaddr{font-family:var(--mono);font-size:.78rem;color:var(--accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.iaddr.ph{color:var(--muted);font-style:italic}
+.itoolbar-r{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.imeta{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.rbtn{background:transparent;border:1px solid var(--b2);color:var(--muted2);cursor:pointer;padding:4px 10px;border-radius:6px;font-size:.72rem;font-family:var(--mono);transition:all .14s;display:flex;align-items:center;gap:5px}
+.rbtn:hover{border-color:var(--accent-mid);color:var(--accent)}.rbtn:disabled{opacity:.3;cursor:not-allowed}
+
+.inbox-body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.inbox-body::-webkit-scrollbar{width:4px}.inbox-body::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+.iplaceholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.85rem;padding:3rem;text-align:center}
+.iplaceholder .bigicon{font-size:2.5rem;opacity:.12}
+.iplaceholder h3{font-size:.95rem;font-weight:700;color:var(--muted2)}
+.iplaceholder p{font-size:.8rem;color:var(--muted);line-height:1.6;max-width:300px}
+
+.msg-list{display:flex;flex-direction:column}
+.msg-item{display:flex;align-items:flex-start;gap:11px;padding:.9rem 1.4rem;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s}
+.msg-item:hover{background:var(--s2)}
+.msg-item.unread{border-left:3px solid var(--accent)}
+.msg-item.unread .msubj{color:var(--text);font-weight:700}
+.mavatar{width:34px;height:34px;border-radius:7px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:var(--muted2);flex-shrink:0;font-family:var(--mono)}
+.mcontent{flex:1;min-width:0}
+.mfrom{font-size:.75rem;font-weight:600;color:var(--muted2);margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msubj{font-size:.85rem;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:1px}
+.mprev{font-size:.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mtime{font-family:var(--mono);font-size:.65rem;color:var(--muted);white-space:nowrap;flex-shrink:0}
+.unread-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;flex-shrink:0;margin-top:4px}
+
+.edetail{display:none;flex-direction:column;flex:1}
+.edetail.open{display:flex}
+.dheader{padding:1.1rem 1.4rem;border-bottom:1px solid var(--b1);background:var(--s2)}
+.dback{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;color:var(--muted);background:transparent;border:none;cursor:pointer;font-family:var(--sans);margin-bottom:.65rem;transition:color .13s;padding:0}
+.dback:hover{color:var(--accent)}
+.dsubj{font-size:1rem;font-weight:700;margin-bottom:.4rem;line-height:1.3}
+.dmeta{font-size:.74rem;color:var(--muted);font-family:var(--mono);line-height:1.9}
+.dmeta span{color:var(--muted2)}
+.dbody{flex:1;overflow-y:auto;padding:1.4rem}
+.dbody::-webkit-scrollbar{width:4px}.dbody::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+.email-frame{background:var(--s2);border-radius:8px;padding:1.1rem;font-size:.85rem;line-height:1.75;color:var(--muted2);word-break:break-word;white-space:pre-wrap}
+.code-box{background:var(--accent-dim);border:1px solid var(--accent-mid);border-radius:7px;padding:.8rem 1.4rem;font-family:var(--mono);font-size:1.6rem;font-weight:600;color:var(--accent);letter-spacing:.25em;display:inline-block;margin:.5rem 0 1.25rem;cursor:pointer;transition:background .15s}
+.code-box:hover{background:rgba(0,229,160,0.18)}
+.code-label{font-size:.68rem;color:var(--muted);font-family:var(--mono);margin-bottom:4px}
+
+.spin{animation:spin 0.8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.toast{position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--accent);color:#000;font-family:var(--mono);font-size:.75rem;font-weight:700;padding:.5rem 1.4rem;border-radius:100px;opacity:0;pointer-events:none;transition:all .2s;z-index:999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--b1);padding:.8rem 2rem;display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:.65rem;color:var(--muted)}
+
+@media(max-width:740px){
+  .layout{grid-template-columns:1fr;padding:1rem}
+  .inbox-panel{min-height:380px}
+  header{padding:0 1rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-dot"></div>Drop<em>Mail</em></div>
+  <div class="hdr-right">
+    <span class="domain-badge">@exiled.lat</span>
+    <div id="liveDot"></div>
+    <span id="liveLabel">offline</span>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="left">
+    <div class="card">
+      <div class="card-label">// create inbox</div>
+      <div style="display:flex;gap:0;margin-bottom:.9rem">
+        <input class="gen-input" id="usernameInput" placeholder="username" style="border-radius:8px 0 0 8px;flex:1" maxlength="40" oninput="this.value=this.value.replace(/[^a-z0-9._-]/gi,'').toLowerCase()">
+        <div class="domain-suffix">@exiled.lat</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gen" id="genBtn" onclick="generateAddress()">
+          <span id="genIcon">⚡</span> Generate Random
+        </button>
+        <button class="btn btn-ghost" id="useBtn" onclick="useCustom()" title="Use typed username">✓ Use</button>
+      </div>
+      <div class="cur-addr" id="addrBox" style="margin-top:.9rem">
+        <span class="cur-addr-text ph" id="addrText">No inbox selected</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="copyBtn" onclick="copyAddr()" disabled>📋 Copy</button>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="hist-card">
+      <div class="sec-header">
+        <span class="sec-title">// saved inboxes</span>
+        <span class="pill" id="histCount">0</span>
+      </div>
+      <div class="hist-list" id="histList">
+        <div class="empty-hist">no inboxes yet</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="inbox-panel">
+    <div class="inbox-toolbar">
+      <div class="iaddr ph" id="iAddr">select or create an inbox</div>
+      <div class="itoolbar-r">
+        <span class="imeta" id="iMeta"></span>
+        <button class="rbtn" id="refreshBtn" onclick="refreshInbox()" disabled>
+          <span id="refreshIcon">↻</span> refresh
+        </button>
+      </div>
+    </div>
+    <div class="inbox-body" id="inboxBody">
+      <div class="iplaceholder">
+        <div class="bigicon">📬</div>
+        <h3>Your inbox will appear here</h3>
+        <p>Create an address above — any email sent to <strong style="color:var(--accent)">anything@exiled.lat</strong> will show up here instantly.</p>
+      </div>
+    </div>
+    <div class="edetail" id="eDetail">
+      <div class="dheader">
+        <button class="dback" onclick="closeDetail()">← inbox</button>
+        <div class="dsubj" id="dSubj"></div>
+        <div class="dmeta" id="dMeta"></div>
+      </div>
+      <div class="dbody" id="dBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <span>DropMail — exiled.lat via Mailgun + Supabase</span>
+  <span id="footerStats">0 inboxes saved</span>
+</footer>
+
+<script>
+const SUPABASE_URL = 'https://ylgtgecqhdhakzbjdkqq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ILF6pER_bdL8GppxOzfumg_xsDoMA6T';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+const ADDR_TABLE = 'dropmail_addresses';
+const MSG_TABLE  = 'dropmail_messages';
+const DOMAIN     = 'exiled.lat';
+
+let active = null;
+let pollTimer = null;
+let allAccounts = [];
+let currentMsgs = [];
+
+// ── Supabase: addresses ───────────────────────────────
+async function dbLoadAddresses() {
+  const { data, error } = await db.from(ADDR_TABLE).select('*').order('created_at', { ascending: false });
+  if (error) { handleDbErr(error); return []; }
+  return data || [];
+}
+async function dbSaveAddress(email) {
+  const existing = await db.from(ADDR_TABLE).select('id').eq('email', email).single();
+  if (existing.data) return; // already saved
+  const { error } = await db.from(ADDR_TABLE).insert([{ email, token: '', account_id: DOMAIN }]);
+  if (error && error.code !== '23505') handleDbErr(error);
+}
+async function dbDelAddress(email) {
+  await db.from(ADDR_TABLE).delete().eq('email', email);
+}
+
+// ── Supabase: messages ────────────────────────────────
+async function dbLoadMessages(toAddress) {
+  const { data, error } = await db
+    .from(MSG_TABLE)
+    .select('*')
+    .eq('to_address', toAddress.toLowerCase())
+    .order('received_at', { ascending: false });
+  if (error) { console.error(error); return []; }
+  return data || [];
+}
+async function dbMarkSeen(id) {
+  await db.from(MSG_TABLE).update({ seen: true }).eq('id', id);
+}
+async function dbDeleteMsg(id) {
+  await db.from(MSG_TABLE).delete().eq('id', id);
+}
+
+function handleDbErr(e) {
+  if (e.code === '42P01') {
+    setStatus('Table missing — see setup instructions', 'err');
+  } else {
+    setStatus('DB: ' + e.message, 'err');
+  }
+}
+
+// ── Generate / use address ────────────────────────────
+function generateAddress() {
+  const adjs  = ['cozy','swift','fuzzy','lucky','sunny','brave','witty','calm','merry','jolly','silent','clever','noble','vivid','peppy','zippy','funky','shiny'];
+  const nouns = ['tiger','panda','falcon','river','pebble','ember','cloud','spark','maple','cedar','orbit','pixel','quill','raven','stone','brook','flame','comet'];
+  const a = adjs[Math.floor(Math.random()*adjs.length)];
+  const n = nouns[Math.floor(Math.random()*nouns.length)];
+  const num = Math.floor(Math.random()*9000)+100;
+  const username = `${a}${n}${num}`;
+  document.getElementById('usernameInput').value = username;
+  activateAddress(`${username}@${DOMAIN}`);
+}
+
+function useCustom() {
+  const val = document.getElementById('usernameInput').value.trim();
+  if (!val) { setStatus('Enter a username first', 'err'); return; }
+  activateAddress(`${val}@${DOMAIN}`);
+}
+
+async function activateAddress(email) {
+  await dbSaveAddress(email);
+  setActive(email);
+  setStatus('✓ Inbox ready — share this address!', 'ok');
+  showToast('Inbox created!');
+  await loadHistory();
+}
+
+// ── History ───────────────────────────────────────────
+async function loadHistory() {
+  allAccounts = await dbLoadAddresses();
+  renderHistory();
+  document.getElementById('footerStats').textContent =
+    `${allAccounts.length} inbox${allAccounts.length !== 1 ? 'es' : ''} saved`;
+}
+
+function renderHistory() {
+  const list = document.getElementById('histList');
+  document.getElementById('histCount').textContent = allAccounts.length;
+  if (!allAccounts.length) {
+    list.innerHTML = '<div class="empty-hist">no inboxes yet</div>';
+    return;
+  }
+  list.innerHTML = allAccounts.map(a => `
+    <div class="hist-item ${active === a.email ? 'sel' : ''}" onclick="setActive('${esc(a.email)}')">
+      <span class="hist-addr">${esc(a.email)}</span>
+      <div class="ha">
+        <button class="ibtn" onclick="event.stopPropagation();copySpec('${esc(a.email)}')" title="Copy">📋</button>
+        <button class="ibtn del" onclick="event.stopPropagation();delAddress('${esc(a.email)}')" title="Delete">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+async function delAddress(email) {
+  await dbDelAddress(email);
+  if (active === email) { active = null; stopPoll(); resetInbox(); }
+  await loadHistory();
+  showToast('Deleted');
+}
+
+// ── Active inbox ──────────────────────────────────────
+function setActive(email) {
+  stopPoll();
+  active = email;
+
+  document.getElementById('addrBox').classList.add('active');
+  document.getElementById('addrText').textContent = email;
+  document.getElementById('addrText').classList.remove('ph');
+  document.getElementById('copyBtn').disabled = false;
+  document.getElementById('refreshBtn').disabled = false;
+  document.getElementById('iAddr').textContent = email;
+  document.getElementById('iAddr').classList.remove('ph');
+
+  setLive(true);
+  refreshInbox();
+  startPoll();
+  renderHistory();
+}
+
+async function refreshInbox() {
+  if (!active) return;
+  const rbtn = document.getElementById('refreshBtn');
+  const icon = document.getElementById('refreshIcon');
+  rbtn.disabled = true;
+  icon.classList.add('spin');
+  try {
+    const msgs = await dbLoadMessages(active);
+    currentMsgs = msgs;
+    renderMsgs(msgs);
+  } catch(e) {
+    setStatus('Error: ' + e.message, 'err');
+  } finally {
+    rbtn.disabled = false;
+    icon.classList.remove('spin');
+  }
+}
+
+function renderMsgs(msgs) {
+  const body = document.getElementById('inboxBody');
+  const unread = msgs.filter(m => !m.seen).length;
+  document.getElementById('iMeta').textContent = msgs.length
+    ? `${msgs.length} msg${msgs.length !== 1 ? 's' : ''}${unread ? ` · ${unread} new` : ''}`
+    : 'empty';
+
+  if (!msgs.length) {
+    body.innerHTML = `<div class="iplaceholder">
+      <div class="bigicon">📭</div>
+      <h3>Inbox is empty</h3>
+      <p>Send any email to <strong style="color:var(--accent);font-family:var(--mono);font-size:.8rem">${esc(active)}</strong> and it'll appear here within seconds.</p>
+    </div>`;
+    return;
+  }
+
+  body.innerHTML = '<div class="msg-list">' + msgs.map(m => {
+    const from = m.from_address || 'unknown';
+    const name = from.split('@')[0] || from;
+    const initials = name.replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase() || '??';
+    const unread = !m.seen;
+    return `<div class="msg-item ${unread ? 'unread' : ''}" onclick="openMsg('${m.id}')">
+      ${unread ? '<div class="unread-dot"></div>' : ''}
+      <div class="mavatar">${initials}</div>
+      <div class="mcontent">
+        <div class="mfrom">${esc(from)}</div>
+        <div class="msubj">${esc(m.subject || '(no subject)')}</div>
+        <div class="mprev">${esc((m.body_text || '').slice(0, 80))}</div>
+      </div>
+      <div class="mtime">${fmtTime(m.received_at)}</div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+async function openMsg(id) {
+  const msg = currentMsgs.find(m => m.id === id);
+  if (!msg) return;
+
+  await dbMarkSeen(id);
+  currentMsgs = currentMsgs.map(m => m.id === id ? {...m, seen: true} : m);
+
+  document.getElementById('dSubj').textContent = msg.subject || '(no subject)';
+  document.getElementById('dMeta').innerHTML =
+    `From: <span>${esc(msg.from_address || '')}</span><br>` +
+    `To: <span>${esc(msg.to_address || '')}</span><br>` +
+    `Date: <span>${new Date(msg.received_at).toLocaleString()}</span>`;
+
+  const txt = msg.body_text || stripHtml(msg.body_html || '') || '(empty message)';
+
+  // detect verification codes: 4-8 digit numbers or 5-10 char alphanumeric codes
+  const codePatterns = [
+    /\b(\d{6})\b/,       // 6-digit (most common: Discord, Google)
+    /\b(\d{4,8})\b/,     // 4-8 digit
+    /\b([A-Z0-9]{6,10})\b/, // alphanumeric uppercase
+  ];
+  let detectedCode = null;
+  for (const pat of codePatterns) {
+    const m = txt.match(pat);
+    if (m) { detectedCode = m[1]; break; }
+  }
+
+  let bodyHtml = '';
+  if (detectedCode) {
+    bodyHtml += `<div class="code-label">// verification code — click to copy</div>
+      <div class="code-box" onclick="copySpec('${esc(detectedCode)}');showToast('Code copied!')">${esc(detectedCode)}</div><br>`;
+  }
+  bodyHtml += `<div class="email-frame">${esc(txt)}</div>`;
+
+  document.getElementById('dBody').innerHTML = bodyHtml;
+  document.getElementById('inboxBody').style.display = 'none';
+  document.getElementById('eDetail').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('eDetail').classList.remove('open');
+  document.getElementById('inboxBody').style.display = '';
+  renderMsgs(currentMsgs);
+}
+
+// ── Realtime subscription ─────────────────────────────
+function subscribeRealtime() {
+  db.channel('dropmail_messages')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: MSG_TABLE },
+      payload => {
+        if (active && payload.new.to_address === active.toLowerCase()) {
+          currentMsgs = [payload.new, ...currentMsgs];
+          renderMsgs(currentMsgs);
+          showToast('📨 New email!');
+        }
+      })
+    .subscribe();
+}
+
+// ── Poll (backup for realtime) ────────────────────────
+function startPoll() { pollTimer = setInterval(() => { if (active && !document.getElementById('eDetail').classList.contains('open')) refreshInbox(); }, 8000); }
+function stopPoll() { clearInterval(pollTimer); pollTimer = null; }
+function resetInbox() {
+  document.getElementById('iAddr').textContent = 'select or create an inbox';
+  document.getElementById('iAddr').classList.add('ph');
+  document.getElementById('refreshBtn').disabled = true;
+  document.getElementById('iMeta').textContent = '';
+  document.getElementById('inboxBody').innerHTML = `<div class="iplaceholder"><div class="bigicon">📬</div><h3>Your inbox will appear here</h3><p>Create an address above — any email sent to <strong style="color:var(--accent)">anything@exiled.lat</strong> will show up here.</p></div>`;
+  setLive(false);
+}
+
+// ── UI helpers ────────────────────────────────────────
+function setStatus(msg, type='') { const e = document.getElementById('status'); e.textContent = msg; e.className = 'status ' + type; }
+function setLive(on) { document.getElementById('liveDot').className = on ? 'live' : ''; document.getElementById('liveLabel').textContent = on ? 'live' : 'offline'; }
+function copyAddr() { if (active) copySpec(active); }
+function copySpec(v) { navigator.clipboard.writeText(v).then(() => showToast('Copied!')); }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function stripHtml(h) { return h.replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
+function fmtTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso), now = new Date(), diff = now - d;
+  if (isNaN(diff)) return iso;
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  return d.toLocaleDateString();
+}
+
+// ── Init ──────────────────────────────────────────────
+loadHistory();
+subscribeRealtime();
+</script>
+</body>
+</html>
+
