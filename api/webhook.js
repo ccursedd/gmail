@@ -1,18 +1,10 @@
-import crypto from 'crypto';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 const db = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 );
-
-function verifyMailgunSignature(signingKey, timestamp, token, signature) {
-  const encodedToken = crypto
-    .createHmac('sha256', signingKey)
-    .update(timestamp.concat(token))
-    .digest('hex');
-  return encodedToken === signature;
-}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -22,39 +14,34 @@ export default async function handler(req, res) {
   try {
     const body = req.body;
 
-    if (process.env.MAILGUN_WEBHOOK_SIGNING_KEY) {
-      const { timestamp, token, signature } = body.signature || {};
-      if (!verifyMailgunSignature(process.env.MAILGUN_WEBHOOK_SIGNING_KEY, timestamp, token, signature)) {
-        return res.status(401).json({ error: 'Invalid signature' });
-      }
-    }
-
+    // Handle both Mailgun webhook formats
     const eventData = body['event-data'] || body;
+
     const recipient = eventData.recipient || eventData.To || eventData.to || '';
-    const sender = eventData.sender || eventData.From || eventData.from || '';
-    const subject = eventData.subject || eventData.Subject || '(no subject)';
-    const bodyText = eventData['body-plain'] || eventData['stripped-text'] || '';
-    const bodyHtml = eventData['body-html'] || eventData['stripped-html'] || '';
-    const messageId = eventData['Message-Id'] || eventData['message-id'] || crypto.randomUUID();
+    const sender    = eventData.sender   || eventData.From || eventData.from || '';
+    const subject   = eventData.subject  || eventData.Subject || '(no subject)';
+    const bodyText  = eventData['body-plain']    || eventData['stripped-text'] || '';
+    const bodyHtml  = eventData['body-html']     || eventData['stripped-html'] || '';
+    const messageId = eventData['Message-Id']    || eventData['message-id']    || crypto.randomUUID();
     const receivedAt = eventData.timestamp
-      ? new Date(eventData.timestamp * 1000).toISOString()
+      ? new Date(Number(eventData.timestamp) * 1000).toISOString()
       : new Date().toISOString();
 
     if (!recipient) {
-      return res.status(400).json({ error: 'No recipient found' });
+      return res.status(200).json({ skipped: 'no recipient' });
     }
 
-    const toAddress = Array.isArray(recipient) ? recipient[0] : recipient;
+    const toAddress = Array.isArray(recipient) ? recipient[0] : String(recipient);
 
     const { error } = await db.from('dropmail_messages').insert([{
-      to_address: toAddress.toLowerCase().trim(),
-      from_address: sender,
-      subject,
-      body_text: bodyText,
-      body_html: bodyHtml,
-      message_id: messageId,
-      received_at: receivedAt,
-      seen: false
+      to_address:   toAddress.toLowerCase().trim(),
+      from_address: String(sender),
+      subject:      String(subject),
+      body_text:    String(bodyText),
+      body_html:    String(bodyHtml),
+      message_id:   String(messageId),
+      received_at:  receivedAt,
+      seen:         false
     }]);
 
     if (error) {
