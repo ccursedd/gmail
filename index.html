@@ -11,8 +11,7 @@
   --bg:#060608;--s1:#0e0e14;--s2:#161620;--s3:#1e1e2c;
   --b1:#252535;--b2:#353550;
   --accent:#00e5a0;--accent-dim:rgba(0,229,160,0.1);--accent-mid:rgba(0,229,160,0.35);
-  --text:#e8e8f0;--muted:#6b6b88;--muted2:#9898b0;
-  --red:#ff4f6d;
+  --text:#e8e8f0;--muted:#6b6b88;--muted2:#9898b0;--red:#ff4f6d;
   --mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -20,49 +19,71 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;flex-direction:column;min-height:100vh}
 body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
 
+/* ── AUTH PAGE ── */
+#authPage{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.auth-box{background:var(--s1);border:1px solid var(--b1);border-radius:18px;padding:2.5rem 2rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:1.25rem}
+.auth-logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;justify-content:center;margin-bottom:.25rem}
+.auth-logo-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.auth-logo em{font-style:normal;color:var(--accent)}
+.auth-sub{text-align:center;font-size:.8rem;color:var(--muted);font-family:var(--mono);margin-bottom:.5rem}
+.auth-tabs{display:flex;background:var(--bg);border-radius:8px;padding:3px;gap:3px}
+.auth-tab{flex:1;padding:.55rem;text-align:center;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:6px;transition:all .15s;border:none;background:transparent;color:var(--muted)}
+.auth-tab.active{background:var(--accent);color:#000}
+.auth-field{display:flex;flex-direction:column;gap:6px}
+.auth-field label{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.auth-input{background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:.75rem 1rem;font-family:var(--mono);font-size:.85rem;color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.auth-input:focus{border-color:var(--accent-mid)}
+.auth-input::placeholder{color:var(--muted)}
+.auth-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:.8rem;font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s;width:100%}
+.auth-btn:hover{background:#00ffb3;transform:translateY(-1px)}
+.auth-btn:active{transform:translateY(0)}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.auth-err{font-family:var(--mono);font-size:.72rem;color:var(--red);text-align:center;min-height:18px}
+.auth-ok{font-family:var(--mono);font-size:.72rem;color:var(--accent);text-align:center;min-height:18px}
+.auth-divider{height:1px;background:var(--b1);margin:.25rem 0}
+
+/* ── MAIN APP ── */
+#appPage{display:none;flex-direction:column;flex:1}
+#appPage.show{display:flex}
 header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;border-bottom:1px solid var(--b1);background:rgba(6,6,8,0.94);backdrop-filter:blur(16px)}
 .logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:1.2rem;font-weight:800;letter-spacing:-0.5px}
 .logo-dot{width:9px;height:9px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
 .logo em{font-style:normal;color:var(--accent)}
 .domain-badge{font-family:var(--mono);font-size:.7rem;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-mid);padding:3px 10px;border-radius:20px}
 .hdr-right{display:flex;align-items:center;gap:10px}
 #liveDot{width:6px;height:6px;background:var(--muted);border-radius:50%;transition:background .3s,box-shadow .3s}
 #liveDot.live{background:var(--accent);box-shadow:0 0 6px var(--accent)}
 #liveLabel{font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.user-pill{font-family:var(--mono);font-size:.68rem;color:var(--muted2);background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:3px 10px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.logout-btn{background:transparent;border:1px solid var(--b2);color:var(--muted);cursor:pointer;padding:4px 10px;border-radius:6px;font-size:.7rem;font-family:var(--mono);transition:all .14s}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
 
 .layout{position:relative;z-index:1;flex:1;display:grid;grid-template-columns:320px 1fr;max-width:1080px;margin:0 auto;width:100%;padding:1.75rem 1.5rem;gap:1.25rem}
-
 .left{display:flex;flex-direction:column;gap:1rem}
 .card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:1.4rem}
 .card-label{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.7rem}
-
-.gen-wrap{display:flex;gap:8px;margin-bottom:.9rem}
-.gen-input{flex:1;background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:.7rem 1rem;font-family:var(--mono);font-size:.82rem;color:var(--accent);outline:none;transition:border-color .15s}
+.input-row{display:flex;margin-bottom:.9rem}
+.gen-input{flex:1;background:var(--bg);border:1px solid var(--b2);border-radius:8px 0 0 8px;padding:.7rem 1rem;font-family:var(--mono);font-size:.82rem;color:var(--accent);outline:none;transition:border-color .15s}
 .gen-input:focus{border-color:var(--accent-mid)}
 .gen-input::placeholder{color:var(--muted)}
-.domain-suffix{background:var(--bg);border:1px solid var(--b2);border-left:none;border-radius:0 8px 8px 0;padding:.7rem .9rem;font-family:var(--mono);font-size:.82rem;color:var(--muted);white-space:nowrap;margin-left:-4px;flex-shrink:0}
-
+.domain-suffix{background:var(--bg);border:1px solid var(--b2);border-left:none;border-radius:0 8px 8px 0;padding:.7rem .9rem;font-family:var(--mono);font-size:.82rem;color:var(--muted);white-space:nowrap;flex-shrink:0}
 .btn-row{display:flex;gap:8px}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:.6rem 1rem;border-radius:7px;font-family:var(--sans);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .14s;border:none;outline:none;white-space:nowrap}
 .btn-gen{background:var(--accent);color:#000;flex:1;justify-content:center}
 .btn-gen:hover{background:#00ffb3;transform:translateY(-1px)}
 .btn-gen:active{transform:translateY(0)}
-.btn-gen:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--b2)}
 .btn-ghost:hover{border-color:var(--accent-mid);color:var(--accent)}
 .btn-ghost:disabled{opacity:.3;cursor:not-allowed}
 .btn-ghost:disabled:hover{border-color:var(--b2);color:var(--muted2)}
-
-.cur-addr{background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:.8rem 1rem;margin-bottom:.9rem;min-height:48px;display:flex;align-items:center;gap:8px;position:relative;overflow:hidden}
+.cur-addr{background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:.8rem 1rem;margin:.9rem 0;min-height:48px;display:flex;align-items:center;position:relative;overflow:hidden}
 .cur-addr::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .3s}
 .cur-addr.active::before{opacity:1}
 .cur-addr-text{font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all;flex:1}
 .cur-addr-text.ph{color:var(--muted);font-style:italic;font-size:.75rem}
-
 .status{font-family:var(--mono);font-size:.7rem;margin-top:.6rem;min-height:16px;color:var(--muted)}
 .status.ok{color:var(--accent)}.status.err{color:var(--red)}
-
 .hist-card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:1.25rem 1.4rem;flex:1;display:flex;flex-direction:column;overflow:hidden}
 .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
 .sec-title{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
@@ -77,7 +98,6 @@ header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify
 .ibtn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:3px 5px;border-radius:4px;font-size:12px;transition:color .13s}
 .ibtn:hover{color:var(--text)}.ibtn.del:hover{color:var(--red)}
 .empty-hist{text-align:center;padding:1.5rem;color:var(--muted);font-family:var(--mono);font-size:.75rem}
-
 .inbox-panel{display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;min-height:500px}
 .inbox-toolbar{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.4rem;border-bottom:1px solid var(--b1);background:var(--s2);gap:12px}
 .iaddr{font-family:var(--mono);font-size:.78rem;color:var(--accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
@@ -86,15 +106,12 @@ header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify
 .imeta{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
 .rbtn{background:transparent;border:1px solid var(--b2);color:var(--muted2);cursor:pointer;padding:4px 10px;border-radius:6px;font-size:.72rem;font-family:var(--mono);transition:all .14s;display:flex;align-items:center;gap:5px}
 .rbtn:hover{border-color:var(--accent-mid);color:var(--accent)}.rbtn:disabled{opacity:.3;cursor:not-allowed}
-
 .inbox-body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
 .inbox-body::-webkit-scrollbar{width:4px}.inbox-body::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
-
 .iplaceholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.85rem;padding:3rem;text-align:center}
 .iplaceholder .bigicon{font-size:2.5rem;opacity:.12}
 .iplaceholder h3{font-size:.95rem;font-weight:700;color:var(--muted2)}
 .iplaceholder p{font-size:.8rem;color:var(--muted);line-height:1.6;max-width:300px}
-
 .msg-list{display:flex;flex-direction:column}
 .msg-item{display:flex;align-items:flex-start;gap:11px;padding:.9rem 1.4rem;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s}
 .msg-item:hover{background:var(--s2)}
@@ -106,8 +123,6 @@ header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify
 .msubj{font-size:.85rem;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:1px}
 .mprev{font-size:.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mtime{font-family:var(--mono);font-size:.65rem;color:var(--muted);white-space:nowrap;flex-shrink:0}
-.unread-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;flex-shrink:0;margin-top:4px}
-
 .edetail{display:none;flex-direction:column;flex:1}
 .edetail.open{display:flex}
 .dheader{padding:1.1rem 1.4rem;border-bottom:1px solid var(--b1);background:var(--s2)}
@@ -119,104 +134,117 @@ header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify
 .dbody{flex:1;overflow-y:auto;padding:1.4rem}
 .dbody::-webkit-scrollbar{width:4px}.dbody::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
 .email-frame{background:var(--s2);border-radius:8px;padding:1.1rem;font-size:.85rem;line-height:1.75;color:var(--muted2);word-break:break-word;white-space:pre-wrap}
-.code-box{background:var(--accent-dim);border:1px solid var(--accent-mid);border-radius:7px;padding:.8rem 1.4rem;font-family:var(--mono);font-size:1.6rem;font-weight:600;color:var(--accent);letter-spacing:.25em;display:inline-block;margin:.5rem 0 1.25rem;cursor:pointer;transition:background .15s}
-.code-box:hover{background:rgba(0,229,160,0.18)}
 .code-label{font-size:.68rem;color:var(--muted);font-family:var(--mono);margin-bottom:4px}
-
+.code-box{background:var(--accent-dim);border:1px solid var(--accent-mid);border-radius:7px;padding:.8rem 1.4rem;font-family:var(--mono);font-size:1.6rem;font-weight:600;color:var(--accent);letter-spacing:.25em;display:inline-block;margin:.4rem 0 1.2rem;cursor:pointer;transition:background .15s}
+.code-box:hover{background:rgba(0,229,160,0.2)}
 .spin{animation:spin 0.8s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
-
 .toast{position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--accent);color:#000;font-family:var(--mono);font-size:.75rem;font-weight:700;padding:.5rem 1.4rem;border-radius:100px;opacity:0;pointer-events:none;transition:all .2s;z-index:999}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
 footer{position:relative;z-index:1;border-top:1px solid var(--b1);padding:.8rem 2rem;display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:.65rem;color:var(--muted)}
-
-@media(max-width:740px){
-  .layout{grid-template-columns:1fr;padding:1rem}
-  .inbox-panel{min-height:380px}
-  header{padding:0 1rem}
-}
+@media(max-width:740px){.layout{grid-template-columns:1fr;padding:1rem}.inbox-panel{min-height:380px}header{padding:0 1rem}}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo"><div class="logo-dot"></div>Drop<em>Mail</em></div>
-  <div class="hdr-right">
-    <span class="domain-badge">@exiled.lat</span>
-    <div id="liveDot"></div>
-    <span id="liveLabel">offline</span>
-  </div>
-</header>
-
-<div class="layout">
-  <div class="left">
-    <div class="card">
-      <div class="card-label">// create inbox</div>
-      <div style="display:flex;gap:0;margin-bottom:.9rem">
-        <input class="gen-input" id="usernameInput" placeholder="username" style="border-radius:8px 0 0 8px;flex:1" maxlength="40" oninput="this.value=this.value.replace(/[^a-z0-9._-]/gi,'').toLowerCase()">
-        <div class="domain-suffix">@exiled.lat</div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-gen" id="genBtn" onclick="generateAddress()">
-          <span id="genIcon">⚡</span> Generate Random
-        </button>
-        <button class="btn btn-ghost" id="useBtn" onclick="useCustom()" title="Use typed username">✓ Use</button>
-      </div>
-      <div class="cur-addr" id="addrBox" style="margin-top:.9rem">
-        <span class="cur-addr-text ph" id="addrText">No inbox selected</span>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost" id="copyBtn" onclick="copyAddr()" disabled>📋 Copy</button>
-      </div>
-      <div class="status" id="status"></div>
+<!-- ── AUTH PAGE ── -->
+<div id="authPage">
+  <div class="auth-box">
+    <div class="auth-logo"><div class="auth-logo-dot"></div>Drop<em>Mail</em></div>
+    <div class="auth-sub">@exiled.lat — your private inbox</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
     </div>
-
-    <div class="hist-card">
-      <div class="sec-header">
-        <span class="sec-title">// saved inboxes</span>
-        <span class="pill" id="histCount">0</span>
-      </div>
-      <div class="hist-list" id="histList">
-        <div class="empty-hist">no inboxes yet</div>
-      </div>
+    <div class="auth-field">
+      <label>Email</label>
+      <input class="auth-input" id="authEmail" type="email" placeholder="you@example.com" autocomplete="email">
     </div>
-  </div>
-
-  <div class="inbox-panel">
-    <div class="inbox-toolbar">
-      <div class="iaddr ph" id="iAddr">select or create an inbox</div>
-      <div class="itoolbar-r">
-        <span class="imeta" id="iMeta"></span>
-        <button class="rbtn" id="refreshBtn" onclick="refreshInbox()" disabled>
-          <span id="refreshIcon">↻</span> refresh
-        </button>
-      </div>
+    <div class="auth-field">
+      <label>Password</label>
+      <input class="auth-input" id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <div class="inbox-body" id="inboxBody">
-      <div class="iplaceholder">
-        <div class="bigicon">📬</div>
-        <h3>Your inbox will appear here</h3>
-        <p>Create an address above — any email sent to <strong style="color:var(--accent)">anything@exiled.lat</strong> will show up here instantly.</p>
-      </div>
-    </div>
-    <div class="edetail" id="eDetail">
-      <div class="dheader">
-        <button class="dback" onclick="closeDetail()">← inbox</button>
-        <div class="dsubj" id="dSubj"></div>
-        <div class="dmeta" id="dMeta"></div>
-      </div>
-      <div class="dbody" id="dBody"></div>
-    </div>
+    <div class="auth-err" id="authErr"></div>
+    <button class="auth-btn" id="authBtn" onclick="handleAuth()">Sign In</button>
+    <div class="auth-ok" id="authOk"></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- ── MAIN APP ── -->
+<div id="appPage">
+  <header>
+    <div class="logo"><div class="logo-dot"></div>Drop<em>Mail</em></div>
+    <div class="hdr-right">
+      <span class="domain-badge">@exiled.lat</span>
+      <span class="user-pill" id="userPill"></span>
+      <div id="liveDot"></div>
+      <span id="liveLabel">offline</span>
+      <button class="logout-btn" onclick="logout()">sign out</button>
+    </div>
+  </header>
 
-<footer>
-  <span>DropMail — exiled.lat via Mailgun + Supabase</span>
-  <span id="footerStats">0 inboxes saved</span>
-</footer>
+  <div class="layout">
+    <div class="left">
+      <div class="card">
+        <div class="card-label">// create inbox</div>
+        <div class="input-row">
+          <input class="gen-input" id="usernameInput" placeholder="username" maxlength="40" oninput="this.value=this.value.replace(/[^a-z0-9._-]/gi,'').toLowerCase()">
+          <div class="domain-suffix">@exiled.lat</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-gen" onclick="generateAddress()"><span id="genIcon">⚡</span> Generate Random</button>
+          <button class="btn btn-ghost" onclick="useCustom()">✓ Use</button>
+        </div>
+        <div class="cur-addr" id="addrBox">
+          <span class="cur-addr-text ph" id="addrText">No inbox selected</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="copyBtn" onclick="copyAddr()" disabled>📋 Copy</button>
+        </div>
+        <div class="status" id="status"></div>
+      </div>
+      <div class="hist-card">
+        <div class="sec-header">
+          <span class="sec-title">// my inboxes</span>
+          <span class="pill" id="histCount">0</span>
+        </div>
+        <div class="hist-list" id="histList"><div class="empty-hist">no inboxes yet</div></div>
+      </div>
+    </div>
+
+    <div class="inbox-panel">
+      <div class="inbox-toolbar">
+        <div class="iaddr ph" id="iAddr">select or create an inbox</div>
+        <div class="itoolbar-r">
+          <span class="imeta" id="iMeta"></span>
+          <button class="rbtn" id="refreshBtn" onclick="refreshInbox()" disabled><span id="refreshIcon">↻</span> refresh</button>
+        </div>
+      </div>
+      <div class="inbox-body" id="inboxBody">
+        <div class="iplaceholder">
+          <div class="bigicon">📬</div>
+          <h3>Your inbox will appear here</h3>
+          <p>Create an address above — any email sent to <strong style="color:var(--accent)">anything@exiled.lat</strong> will show up here instantly.</p>
+        </div>
+      </div>
+      <div class="edetail" id="eDetail">
+        <div class="dheader">
+          <button class="dback" onclick="closeDetail()">← inbox</button>
+          <div class="dsubj" id="dSubj"></div>
+          <div class="dmeta" id="dMeta"></div>
+        </div>
+        <div class="dbody" id="dBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>DropMail — exiled.lat via Mailgun + Supabase</span>
+    <span id="footerStats">0 inboxes saved</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const SUPABASE_URL = 'https://ylgtgecqhdhakzbjdkqq.supabase.co';
@@ -231,27 +259,112 @@ let active = null;
 let pollTimer = null;
 let allAccounts = [];
 let currentMsgs = [];
+let currentUser = null;
 
-// ── Supabase: addresses ───────────────────────────────
+// ── AUTH ──────────────────────────────────────────────
+let authMode = 'login';
+
+function switchTab(mode) {
+  authMode = mode;
+  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+  document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
+  document.getElementById('authBtn').textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+  document.getElementById('authErr').textContent = '';
+  document.getElementById('authOk').textContent = '';
+}
+
+async function handleAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const btn = document.getElementById('authBtn');
+  const errEl = document.getElementById('authErr');
+  const okEl = document.getElementById('authOk');
+
+  errEl.textContent = '';
+  okEl.textContent = '';
+
+  if (!email || !password) { errEl.textContent = 'Fill in both fields'; return; }
+  if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Please wait…';
+
+  if (authMode === 'signup') {
+    const { data, error } = await db.auth.signUp({ email, password });
+    if (error) {
+      errEl.textContent = error.message;
+    } else if (data.user && !data.session) {
+      okEl.textContent = 'Check your email to confirm your account!';
+    } else {
+      onLogin(data.user);
+    }
+  } else {
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+    if (error) {
+      errEl.textContent = error.message;
+    } else {
+      onLogin(data.user);
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
+}
+
+// allow pressing Enter to submit
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.getElementById('authPage').style.display !== 'none' &&
+      !document.getElementById('authBtn').disabled) {
+    handleAuth();
+  }
+});
+
+function onLogin(user) {
+  currentUser = user;
+  document.getElementById('authPage').style.display = 'none';
+  document.getElementById('appPage').classList.add('show');
+  document.getElementById('userPill').textContent = user.email;
+  init();
+}
+
+async function logout() {
+  await db.auth.signOut();
+  currentUser = null;
+  active = null;
+  stopPoll();
+  allAccounts = [];
+  currentMsgs = [];
+  document.getElementById('appPage').classList.remove('show');
+  document.getElementById('authPage').style.display = 'flex';
+  document.getElementById('authEmail').value = '';
+  document.getElementById('authPassword').value = '';
+  document.getElementById('authErr').textContent = '';
+  document.getElementById('authOk').textContent = '';
+  resetInbox();
+}
+
+// ── Supabase: addresses (per user) ───────────────────
 async function dbLoadAddresses() {
-  const { data, error } = await db.from(ADDR_TABLE).select('*').order('created_at', { ascending: false });
-  if (error) { handleDbErr(error); return []; }
+  const { data, error } = await db.from(ADDR_TABLE)
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+  if (error) { console.error(error); return []; }
   return data || [];
 }
 async function dbSaveAddress(email) {
-  const existing = await db.from(ADDR_TABLE).select('id').eq('email', email).single();
-  if (existing.data) return; // already saved
-  const { error } = await db.from(ADDR_TABLE).insert([{ email, token: '', account_id: DOMAIN }]);
-  if (error && error.code !== '23505') handleDbErr(error);
+  const { data } = await db.from(ADDR_TABLE).select('id').eq('email', email).eq('user_id', currentUser.id).single();
+  if (data) return;
+  const { error } = await db.from(ADDR_TABLE).insert([{ email, token: '', account_id: DOMAIN, user_id: currentUser.id }]);
+  if (error && error.code !== '23505') console.error(error);
 }
 async function dbDelAddress(email) {
-  await db.from(ADDR_TABLE).delete().eq('email', email);
+  await db.from(ADDR_TABLE).delete().eq('email', email).eq('user_id', currentUser.id);
 }
 
 // ── Supabase: messages ────────────────────────────────
 async function dbLoadMessages(toAddress) {
-  const { data, error } = await db
-    .from(MSG_TABLE)
+  const { data, error } = await db.from(MSG_TABLE)
     .select('*')
     .eq('to_address', toAddress.toLowerCase())
     .order('received_at', { ascending: false });
@@ -261,41 +374,25 @@ async function dbLoadMessages(toAddress) {
 async function dbMarkSeen(id) {
   await db.from(MSG_TABLE).update({ seen: true }).eq('id', id);
 }
-async function dbDeleteMsg(id) {
-  await db.from(MSG_TABLE).delete().eq('id', id);
-}
-
-function handleDbErr(e) {
-  if (e.code === '42P01') {
-    setStatus('Table missing — see setup instructions', 'err');
-  } else {
-    setStatus('DB: ' + e.message, 'err');
-  }
-}
 
 // ── Generate / use address ────────────────────────────
 function generateAddress() {
-  const adjs  = ['cozy','swift','fuzzy','lucky','sunny','brave','witty','calm','merry','jolly','silent','clever','noble','vivid','peppy','zippy','funky','shiny'];
-  const nouns = ['tiger','panda','falcon','river','pebble','ember','cloud','spark','maple','cedar','orbit','pixel','quill','raven','stone','brook','flame','comet'];
-  const a = adjs[Math.floor(Math.random()*adjs.length)];
-  const n = nouns[Math.floor(Math.random()*nouns.length)];
-  const num = Math.floor(Math.random()*9000)+100;
-  const username = `${a}${n}${num}`;
-  document.getElementById('usernameInput').value = username;
-  activateAddress(`${username}@${DOMAIN}`);
+  var adjs  = ['cozy','swift','fuzzy','lucky','sunny','brave','witty','calm','merry','jolly','silent','clever','noble','vivid','peppy','zippy','funky','shiny'];
+  var nouns = ['tiger','panda','falcon','river','pebble','ember','cloud','spark','maple','cedar','orbit','pixel','quill','raven','stone','brook','flame','comet'];
+  var user = adjs[Math.floor(Math.random()*adjs.length)] + nouns[Math.floor(Math.random()*nouns.length)] + (Math.floor(Math.random()*9000)+100);
+  document.getElementById('usernameInput').value = user;
+  activateAddress(user + '@' + DOMAIN);
 }
-
 function useCustom() {
-  const val = document.getElementById('usernameInput').value.trim();
+  var val = document.getElementById('usernameInput').value.trim();
   if (!val) { setStatus('Enter a username first', 'err'); return; }
-  activateAddress(`${val}@${DOMAIN}`);
+  activateAddress(val + '@' + DOMAIN);
 }
-
 async function activateAddress(email) {
   await dbSaveAddress(email);
   setActive(email);
   setStatus('✓ Inbox ready — share this address!', 'ok');
-  showToast('Inbox created!');
+  showToast('Inbox ready!');
   await loadHistory();
 }
 
@@ -303,27 +400,21 @@ async function activateAddress(email) {
 async function loadHistory() {
   allAccounts = await dbLoadAddresses();
   renderHistory();
-  document.getElementById('footerStats').textContent =
-    `${allAccounts.length} inbox${allAccounts.length !== 1 ? 'es' : ''} saved`;
+  document.getElementById('footerStats').textContent = allAccounts.length + ' inbox' + (allAccounts.length !== 1 ? 'es' : '') + ' saved';
 }
-
 function renderHistory() {
-  const list = document.getElementById('histList');
+  var list = document.getElementById('histList');
   document.getElementById('histCount').textContent = allAccounts.length;
-  if (!allAccounts.length) {
-    list.innerHTML = '<div class="empty-hist">no inboxes yet</div>';
-    return;
-  }
-  list.innerHTML = allAccounts.map(a => `
-    <div class="hist-item ${active === a.email ? 'sel' : ''}" onclick="setActive('${esc(a.email)}')">
-      <span class="hist-addr">${esc(a.email)}</span>
-      <div class="ha">
-        <button class="ibtn" onclick="event.stopPropagation();copySpec('${esc(a.email)}')" title="Copy">📋</button>
-        <button class="ibtn del" onclick="event.stopPropagation();delAddress('${esc(a.email)}')" title="Delete">🗑</button>
-      </div>
-    </div>`).join('');
+  if (!allAccounts.length) { list.innerHTML = '<div class="empty-hist">no inboxes yet</div>'; return; }
+  list.innerHTML = allAccounts.map(function(a) {
+    return '<div class="hist-item ' + (active === a.email ? 'sel' : '') + '" onclick="setActive(\'' + esc(a.email) + '\')">' +
+      '<span class="hist-addr">' + esc(a.email) + '</span>' +
+      '<div class="ha">' +
+      '<button class="ibtn" onclick="event.stopPropagation();copySpec(\'' + esc(a.email) + '\')" title="Copy">📋</button>' +
+      '<button class="ibtn del" onclick="event.stopPropagation();delAddress(\'' + esc(a.email) + '\')" title="Delete">🗑</button>' +
+      '</div></div>';
+  }).join('');
 }
-
 async function delAddress(email) {
   await dbDelAddress(email);
   if (active === email) { active = null; stopPoll(); resetInbox(); }
@@ -335,7 +426,7 @@ async function delAddress(email) {
 function setActive(email) {
   stopPoll();
   active = email;
-
+  localStorage.setItem('dropmail_active_' + currentUser.id, email);
   document.getElementById('addrBox').classList.add('active');
   document.getElementById('addrText').textContent = email;
   document.getElementById('addrText').classList.remove('ph');
@@ -343,21 +434,19 @@ function setActive(email) {
   document.getElementById('refreshBtn').disabled = false;
   document.getElementById('iAddr').textContent = email;
   document.getElementById('iAddr').classList.remove('ph');
-
   setLive(true);
   refreshInbox();
   startPoll();
   renderHistory();
 }
-
 async function refreshInbox() {
   if (!active) return;
-  const rbtn = document.getElementById('refreshBtn');
-  const icon = document.getElementById('refreshIcon');
+  var rbtn = document.getElementById('refreshBtn');
+  var icon = document.getElementById('refreshIcon');
   rbtn.disabled = true;
   icon.classList.add('spin');
   try {
-    const msgs = await dbLoadMessages(active);
+    var msgs = await dbLoadMessages(active);
     currentMsgs = msgs;
     renderMsgs(msgs);
   } catch(e) {
@@ -367,133 +456,132 @@ async function refreshInbox() {
     icon.classList.remove('spin');
   }
 }
-
 function renderMsgs(msgs) {
-  const body = document.getElementById('inboxBody');
-  const unread = msgs.filter(m => !m.seen).length;
+  var body = document.getElementById('inboxBody');
+  var unread = msgs.filter(function(m) { return !m.seen; }).length;
   document.getElementById('iMeta').textContent = msgs.length
-    ? `${msgs.length} msg${msgs.length !== 1 ? 's' : ''}${unread ? ` · ${unread} new` : ''}`
+    ? msgs.length + ' msg' + (msgs.length !== 1 ? 's' : '') + (unread ? ' · ' + unread + ' new' : '')
     : 'empty';
-
   if (!msgs.length) {
-    body.innerHTML = `<div class="iplaceholder">
-      <div class="bigicon">📭</div>
-      <h3>Inbox is empty</h3>
-      <p>Send any email to <strong style="color:var(--accent);font-family:var(--mono);font-size:.8rem">${esc(active)}</strong> and it'll appear here within seconds.</p>
-    </div>`;
+    body.innerHTML = '<div class="iplaceholder"><div class="bigicon">📭</div><h3>Inbox is empty</h3><p>Send any email to <strong style="color:var(--accent);font-family:var(--mono);font-size:.8rem">' + esc(active) + '</strong> and it\'ll appear here within seconds.</p></div>';
     return;
   }
-
-  body.innerHTML = '<div class="msg-list">' + msgs.map(m => {
-    const from = m.from_address || 'unknown';
-    const name = from.split('@')[0] || from;
-    const initials = name.replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase() || '??';
-    const unread = !m.seen;
-    return `<div class="msg-item ${unread ? 'unread' : ''}" onclick="openMsg('${m.id}')">
-      ${unread ? '<div class="unread-dot"></div>' : ''}
-      <div class="mavatar">${initials}</div>
-      <div class="mcontent">
-        <div class="mfrom">${esc(from)}</div>
-        <div class="msubj">${esc(m.subject || '(no subject)')}</div>
-        <div class="mprev">${esc((m.body_text || '').slice(0, 80))}</div>
-      </div>
-      <div class="mtime">${fmtTime(m.received_at)}</div>
-    </div>`;
+  body.innerHTML = '<div class="msg-list">' + msgs.map(function(m) {
+    var from = m.from_address || 'unknown';
+    var initials = from.replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase() || '??';
+    return '<div class="msg-item ' + (!m.seen ? 'unread' : '') + '" onclick="openMsg(\'' + m.id + '\')">' +
+      '<div class="mavatar">' + initials + '</div>' +
+      '<div class="mcontent">' +
+      '<div class="mfrom">' + esc(from) + '</div>' +
+      '<div class="msubj">' + esc(m.subject || '(no subject)') + '</div>' +
+      '<div class="mprev">' + esc((m.body_text || '').slice(0,80)) + '</div>' +
+      '</div><div class="mtime">' + fmtTime(m.received_at) + '</div></div>';
   }).join('') + '</div>';
 }
-
 async function openMsg(id) {
-  const msg = currentMsgs.find(m => m.id === id);
+  var msg = currentMsgs.find(function(m) { return m.id === id; });
   if (!msg) return;
-
   await dbMarkSeen(id);
-  currentMsgs = currentMsgs.map(m => m.id === id ? {...m, seen: true} : m);
-
+  currentMsgs = currentMsgs.map(function(m) { return m.id === id ? Object.assign({}, m, {seen:true}) : m; });
   document.getElementById('dSubj').textContent = msg.subject || '(no subject)';
   document.getElementById('dMeta').innerHTML =
-    `From: <span>${esc(msg.from_address || '')}</span><br>` +
-    `To: <span>${esc(msg.to_address || '')}</span><br>` +
-    `Date: <span>${new Date(msg.received_at).toLocaleString()}</span>`;
-
-  const txt = msg.body_text || stripHtml(msg.body_html || '') || '(empty message)';
-
-  // detect verification codes: 4-8 digit numbers or 5-10 char alphanumeric codes
-  const codePatterns = [
-    /\b(\d{6})\b/,       // 6-digit (most common: Discord, Google)
-    /\b(\d{4,8})\b/,     // 4-8 digit
-    /\b([A-Z0-9]{6,10})\b/, // alphanumeric uppercase
-  ];
-  let detectedCode = null;
-  for (const pat of codePatterns) {
-    const m = txt.match(pat);
-    if (m) { detectedCode = m[1]; break; }
-  }
-
-  let bodyHtml = '';
-  if (detectedCode) {
-    bodyHtml += `<div class="code-label">// verification code — click to copy</div>
-      <div class="code-box" onclick="copySpec('${esc(detectedCode)}');showToast('Code copied!')">${esc(detectedCode)}</div><br>`;
-  }
-  bodyHtml += `<div class="email-frame">${esc(txt)}</div>`;
-
-  document.getElementById('dBody').innerHTML = bodyHtml;
+    'From: <span>' + esc(msg.from_address||'') + '</span><br>' +
+    'To: <span>' + esc(msg.to_address||'') + '</span><br>' +
+    'Date: <span>' + new Date(msg.received_at).toLocaleString() + '</span>';
+  var txt = msg.body_text || stripHtml(msg.body_html || '') || '(empty message)';
+  var patterns = [/\b(\d{6})\b/, /\b(\d{4,8})\b/, /\b([A-Z0-9]{6,10})\b/];
+  var code = null;
+  for (var i = 0; i < patterns.length; i++) { var m = txt.match(patterns[i]); if (m) { code = m[1]; break; } }
+  var html = '';
+  if (code) html += '<div class="code-label">// verification code — click to copy</div><div class="code-box" onclick="copySpec(\'' + esc(code) + '\');showToast(\'Code copied!\')">' + esc(code) + '</div><br>';
+  html += '<div class="email-frame">' + esc(txt) + '</div>';
+  document.getElementById('dBody').innerHTML = html;
   document.getElementById('inboxBody').style.display = 'none';
   document.getElementById('eDetail').classList.add('open');
 }
-
 function closeDetail() {
   document.getElementById('eDetail').classList.remove('open');
   document.getElementById('inboxBody').style.display = '';
   renderMsgs(currentMsgs);
 }
 
-// ── Realtime subscription ─────────────────────────────
+// ── Realtime ──────────────────────────────────────────
 function subscribeRealtime() {
-  db.channel('dropmail_messages')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: MSG_TABLE },
-      payload => {
-        if (active && payload.new.to_address === active.toLowerCase()) {
-          currentMsgs = [payload.new, ...currentMsgs];
-          renderMsgs(currentMsgs);
-          showToast('📨 New email!');
-        }
-      })
-    .subscribe();
+  db.channel('msgs_' + currentUser.id).on('postgres_changes',
+    { event: 'INSERT', schema: 'public', table: MSG_TABLE },
+    function(payload) {
+      if (active && payload.new.to_address === active.toLowerCase()) {
+        currentMsgs = [payload.new].concat(currentMsgs);
+        renderMsgs(currentMsgs);
+        showToast('📨 New email!');
+      }
+    }
+  ).subscribe();
 }
 
-// ── Poll (backup for realtime) ────────────────────────
-function startPoll() { pollTimer = setInterval(() => { if (active && !document.getElementById('eDetail').classList.contains('open')) refreshInbox(); }, 8000); }
+// ── Poll ──────────────────────────────────────────────
+function startPoll() {
+  pollTimer = setInterval(function() {
+    if (active && !document.getElementById('eDetail').classList.contains('open')) refreshInbox();
+  }, 8000);
+}
 function stopPoll() { clearInterval(pollTimer); pollTimer = null; }
 function resetInbox() {
   document.getElementById('iAddr').textContent = 'select or create an inbox';
   document.getElementById('iAddr').classList.add('ph');
   document.getElementById('refreshBtn').disabled = true;
   document.getElementById('iMeta').textContent = '';
-  document.getElementById('inboxBody').innerHTML = `<div class="iplaceholder"><div class="bigicon">📬</div><h3>Your inbox will appear here</h3><p>Create an address above — any email sent to <strong style="color:var(--accent)">anything@exiled.lat</strong> will show up here.</p></div>`;
+  document.getElementById('inboxBody').innerHTML = '<div class="iplaceholder"><div class="bigicon">📬</div><h3>Your inbox will appear here</h3><p>Create an address above.</p></div>';
+  document.getElementById('addrBox').classList.remove('active');
+  document.getElementById('addrText').textContent = 'No inbox selected';
+  document.getElementById('addrText').classList.add('ph');
+  document.getElementById('copyBtn').disabled = true;
   setLive(false);
 }
 
 // ── UI helpers ────────────────────────────────────────
-function setStatus(msg, type='') { const e = document.getElementById('status'); e.textContent = msg; e.className = 'status ' + type; }
-function setLive(on) { document.getElementById('liveDot').className = on ? 'live' : ''; document.getElementById('liveLabel').textContent = on ? 'live' : 'offline'; }
+function setStatus(msg, type) { var e = document.getElementById('status'); e.textContent = msg; e.className = 'status '+(type||''); }
+function setLive(on) { document.getElementById('liveDot').className = on?'live':''; document.getElementById('liveLabel').textContent = on?'live':'offline'; }
 function copyAddr() { if (active) copySpec(active); }
-function copySpec(v) { navigator.clipboard.writeText(v).then(() => showToast('Copied!')); }
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500); }
+function copySpec(v) { navigator.clipboard.writeText(v).then(function() { showToast('Copied!'); }); }
+function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2500); }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function stripHtml(h) { return h.replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
 function fmtTime(iso) {
   if (!iso) return '';
-  const d = new Date(iso), now = new Date(), diff = now - d;
+  var d=new Date(iso),now=new Date(),diff=now-d;
   if (isNaN(diff)) return iso;
-  if (diff < 60000) return 'just now';
-  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
-  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+  if (diff<60000) return 'just now';
+  if (diff<3600000) return Math.floor(diff/60000)+'m ago';
+  if (diff<86400000) return Math.floor(diff/3600000)+'h ago';
   return d.toLocaleDateString();
 }
 
 // ── Init ──────────────────────────────────────────────
-loadHistory();
-subscribeRealtime();
+async function init() {
+  await loadHistory();
+  subscribeRealtime();
+  // Restore last active inbox for this user
+  var last = localStorage.getItem('dropmail_active_' + currentUser.id);
+  if (last && allAccounts.find(function(a) { return a.email === last; })) {
+    setActive(last);
+  } else if (allAccounts.length > 0) {
+    setActive(allAccounts[0].email);
+  }
+}
+
+// ── Boot: check existing session ─────────────────────
+(async function boot() {
+  const { data: { session } } = await db.auth.getSession();
+  if (session && session.user) {
+    onLogin(session.user);
+  }
+  // Listen for auth changes
+  db.auth.onAuthStateChange(function(event, session) {
+    if (event === 'SIGNED_IN' && session) onLogin(session.user);
+    if (event === 'SIGNED_OUT') logout();
+  });
+})();
 </script>
 </body>
 </html>
