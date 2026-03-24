@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELORA — instant download</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(145deg,#03050b,#0a0f1c);
+  font-family:system-ui;
+  color:white;
+}
+
+/* card */
+.glass-card{
+  backdrop-filter:blur(18px);
+  background:rgba(15,20,35,.6);
+  border-radius:28px;
+  padding:2.5rem;
+  text-align:center;
+  width:100%;
+  max-width:420px;
+  border:1px solid rgba(255,255,255,.15);
+}
+
+/* title */
+.title{
+  font-size:3rem;
+  font-weight:800;
+  margin-bottom:.5rem;
+}
+
+/* badge */
+.badge{
+  font-size:.75rem;
+  opacity:.7;
+  margin-bottom:1rem;
+}
+
+/* file */
+.file-name{
+  font-size:.8rem;
+  opacity:.6;
+  margin-bottom:1.5rem;
+}
+
+/* button */
+.download-btn{
+  background:white;
+  color:black;
+  border:none;
+  padding:1rem 2rem;
+  border-radius:999px;
+  font-size:1.2rem;
+  cursor:pointer;
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+}
+
+.download-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+/* status */
+.status{
+  margin-top:1.5rem;
+  font-size:.85rem;
+  opacity:.8;
+}
+
+/* spinner */
+.spinner{
+  width:16px;
+  height:16px;
+  border:2px solid #00000030;
+  border-top:2px solid black;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="glass-card">
+  <div class="badge">instant secure delivery</div>
+  <div class="title">VELORA</div>
+  <div class="file-name">main.ipa</div>
+
+  <button id="btn" class="download-btn">
+    ⬇ download
+  </button>
+
+  <div id="status" class="status">
+    ready
+  </div>
+</div>
+
+<script>
+const FILE_URL = "https://github.com/ccursedd/download/raw/main/main.ipa";
+const FILE_NAME = "main.ipa";
+
+const btn = document.getElementById("btn");
+const status = document.getElementById("status");
+
+function setLoading(state){
+  if(state){
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> starting...';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = '⬇ download';
+  }
+}
+
+function setStatus(text){
+  status.textContent = text;
+}
+
+function download(){
+  setLoading(true);
+  setStatus("starting download...");
+
+  try{
+    const a = document.createElement("a");
+    a.href = FILE_URL;
+    a.download = FILE_NAME;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    setStatus("✓ download started");
+  }catch(e){
+    setStatus("error — retry");
+  }
+
+  setTimeout(()=>{
+    setLoading(false);
+    setStatus("ready");
+  },2000);
+}
+
+btn.addEventListener("click", download);
+
+// enter key support
+document.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && document.activeElement===btn){
+    download();
+  }
+});
+</script>
+
+</body>
+</html>
