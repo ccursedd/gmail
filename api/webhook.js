@@ -14,15 +14,14 @@ export default async function handler(req, res) {
   try {
     const body = req.body;
 
-    // Handle both Mailgun webhook formats
     const eventData = body['event-data'] || body;
 
-    const recipient = eventData.recipient || eventData.To || eventData.to || '';
-    const sender    = eventData.sender   || eventData.From || eventData.from || '';
-    const subject   = eventData.subject  || eventData.Subject || '(no subject)';
-    const bodyText  = eventData['body-plain']    || eventData['stripped-text'] || '';
-    const bodyHtml  = eventData['body-html']     || eventData['stripped-html'] || '';
-    const messageId = eventData['Message-Id']    || eventData['message-id']    || crypto.randomUUID();
+    const recipient  = eventData.recipient || eventData.To  || eventData.to  || '';
+    const sender     = eventData.sender    || eventData.From || eventData.from || '';
+    const subject    = eventData.subject   || eventData.Subject || '(no subject)';
+    const bodyText   = eventData['body-plain']    || eventData['stripped-text'] || '';
+    const bodyHtml   = eventData['body-html']     || eventData['stripped-html'] || '';
+    const messageId  = eventData['Message-Id']    || eventData['message-id']   || crypto.randomUUID();
     const receivedAt = eventData.timestamp
       ? new Date(Number(eventData.timestamp) * 1000).toISOString()
       : new Date().toISOString();
