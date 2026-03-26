@@ -11,7 +11,7 @@
   --bg:#060608;--s1:#0e0e14;--s2:#161620;--s3:#1e1e2c;
   --b1:#252535;--b2:#353550;
   --accent:#00e5a0;--accent-dim:rgba(0,229,160,0.1);--accent-mid:rgba(0,229,160,0.35);
-  --text:#e8e8f0;--muted:#6b6b88;--muted2:#9898b0;--red:#ff4f6d;
+  --text:#e8e8f0;--muted:#6b6b88;--muted2:#9898b0;--red:#ff4f6d;--yellow:#ffd166;
   --mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -19,33 +19,35 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);display:flex;flex-direction:column;min-height:100vh}
 body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
 
-/* ── AUTH PAGE ── */
-#authPage{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:var(--bg)}
-.auth-box{background:var(--s1);border:1px solid var(--b1);border-radius:18px;padding:2.5rem 2rem;width:100%;max-width:380px;display:flex;flex-direction:column;gap:1.25rem}
-.auth-logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;justify-content:center;margin-bottom:.25rem}
-.auth-logo-dot{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:blink 2s infinite}
+/* ── MODAL OVERLAY ── */
+.overlay{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)}
+.overlay.hidden{display:none}
+.modal{background:var(--s1);border:1px solid var(--b1);border-radius:18px;padding:2.5rem 2rem;width:100%;max-width:400px;display:flex;flex-direction:column;gap:1.1rem}
+.modal-logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;justify-content:center}
+.logo-dot-sm{width:10px;height:10px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
-.auth-logo em{font-style:normal;color:var(--accent)}
-.auth-sub{text-align:center;font-size:.8rem;color:var(--muted);font-family:var(--mono);margin-bottom:.5rem}
-.auth-tabs{display:flex;background:var(--bg);border-radius:8px;padding:3px;gap:3px}
-.auth-tab{flex:1;padding:.55rem;text-align:center;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:6px;transition:all .15s;border:none;background:transparent;color:var(--muted)}
-.auth-tab.active{background:var(--accent);color:#000}
-.auth-field{display:flex;flex-direction:column;gap:6px}
-.auth-field label{font-family:var(--mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
-.auth-input{background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:.75rem 1rem;font-family:var(--mono);font-size:.85rem;color:var(--text);outline:none;transition:border-color .15s;width:100%}
-.auth-input:focus{border-color:var(--accent-mid)}
-.auth-input::placeholder{color:var(--muted)}
-.auth-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:.8rem;font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s;width:100%}
-.auth-btn:hover{background:#00ffb3;transform:translateY(-1px)}
-.auth-btn:active{transform:translateY(0)}
-.auth-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.auth-err{font-family:var(--mono);font-size:.72rem;color:var(--red);text-align:center;min-height:18px}
-.auth-ok{font-family:var(--mono);font-size:.72rem;color:var(--accent);text-align:center;min-height:18px}
-.auth-divider{height:1px;background:var(--b1);margin:.25rem 0}
+.modal-logo em{font-style:normal;color:var(--accent)}
+.modal-sub{text-align:center;font-size:.78rem;color:var(--muted);font-family:var(--mono)}
+.tabs{display:flex;background:var(--bg);border-radius:8px;padding:3px;gap:3px}
+.tab{flex:1;padding:.55rem;text-align:center;font-size:.82rem;font-weight:600;cursor:pointer;border-radius:6px;transition:all .15s;border:none;background:transparent;color:var(--muted)}
+.tab.active{background:var(--accent);color:#000}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.inp{background:var(--bg);border:1px solid var(--b2);border-radius:8px;padding:.72rem 1rem;font-family:var(--mono);font-size:.85rem;color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.inp:focus{border-color:var(--accent-mid)}
+.inp::placeholder{color:var(--muted)}
+.modal-btn{background:var(--accent);color:#000;border:none;border-radius:8px;padding:.8rem;font-family:var(--sans);font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s;width:100%}
+.modal-btn:hover{background:#00ffb3;transform:translateY(-1px)}
+.modal-btn:active{transform:translateY(0)}
+.modal-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.modal-btn.ghost{background:transparent;color:var(--muted2);border:1px solid var(--b2);margin-top:-.3rem}
+.modal-btn.ghost:hover{border-color:var(--accent-mid);color:var(--accent);background:transparent;transform:none}
+.merr{font-family:var(--mono);font-size:.72rem;color:var(--red);text-align:center;min-height:18px}
+.mok{font-family:var(--mono);font-size:.72rem;color:var(--accent);text-align:center;min-height:18px}
+.claim-badge{display:flex;align-items:center;gap:8px;background:rgba(255,209,102,0.08);border:1px solid rgba(255,209,102,0.25);border-radius:8px;padding:.7rem 1rem;font-family:var(--mono);font-size:.75rem;color:var(--yellow)}
+.claimed-badge{display:flex;align-items:center;gap:8px;background:var(--accent-dim);border:1px solid var(--accent-mid);border-radius:8px;padding:.7rem 1rem;font-family:var(--mono);font-size:.75rem;color:var(--accent)}
 
-/* ── MAIN APP ── */
-#appPage{display:none;flex-direction:column;flex:1}
-#appPage.show{display:flex}
+/* ── HEADER ── */
 header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;border-bottom:1px solid var(--b1);background:rgba(6,6,8,0.94);backdrop-filter:blur(16px)}
 .logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:1.2rem;font-weight:800;letter-spacing:-0.5px}
 .logo-dot{width:9px;height:9px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:blink 2s infinite}
@@ -55,10 +57,11 @@ header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify
 #liveDot{width:6px;height:6px;background:var(--muted);border-radius:50%;transition:background .3s,box-shadow .3s}
 #liveDot.live{background:var(--accent);box-shadow:0 0 6px var(--accent)}
 #liveLabel{font-family:var(--mono);font-size:.7rem;color:var(--muted)}
-.user-pill{font-family:var(--mono);font-size:.68rem;color:var(--muted2);background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:3px 10px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.logout-btn{background:transparent;border:1px solid var(--b2);color:var(--muted);cursor:pointer;padding:4px 10px;border-radius:6px;font-size:.7rem;font-family:var(--mono);transition:all .14s}
-.logout-btn:hover{border-color:var(--red);color:var(--red)}
+.user-pill{font-family:var(--mono);font-size:.68rem;color:var(--muted2);background:var(--s2);border:1px solid var(--b1);border-radius:20px;padding:3px 10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.signout-btn{background:transparent;border:1px solid var(--b2);color:var(--muted);cursor:pointer;padding:4px 10px;border-radius:6px;font-size:.7rem;font-family:var(--mono);transition:all .14s}
+.signout-btn:hover{border-color:var(--red);color:var(--red)}
 
+/* ── LAYOUT ── */
 .layout{position:relative;z-index:1;flex:1;display:grid;grid-template-columns:320px 1fr;max-width:1080px;margin:0 auto;width:100%;padding:1.75rem 1.5rem;gap:1.25rem}
 .left{display:flex;flex-direction:column;gap:1rem}
 .card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:1.4rem}
@@ -82,8 +85,8 @@ header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify
 .cur-addr.active::before{opacity:1}
 .cur-addr-text{font-family:var(--mono);font-size:.8rem;color:var(--accent);word-break:break-all;flex:1}
 .cur-addr-text.ph{color:var(--muted);font-style:italic;font-size:.75rem}
-.status{font-family:var(--mono);font-size:.7rem;margin-top:.6rem;min-height:16px;color:var(--muted)}
-.status.ok{color:var(--accent)}.status.err{color:var(--red)}
+.appstatus{font-family:var(--mono);font-size:.7rem;margin-top:.6rem;min-height:16px;color:var(--muted)}
+.appstatus.ok{color:var(--accent)}.appstatus.err{color:var(--red)}
 .hist-card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:1.25rem 1.4rem;flex:1;display:flex;flex-direction:column;overflow:hidden}
 .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
 .sec-title{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
@@ -94,10 +97,13 @@ header{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify
 .hist-item:hover{border-color:var(--b2)}.hist-item.sel{border-color:var(--accent-mid);background:var(--accent-dim)}
 .hist-addr{flex:1;font-family:var(--mono);font-size:.72rem;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hist-item.sel .hist-addr{color:var(--accent)}
+.hist-lock{font-size:11px;flex-shrink:0;opacity:.5}
 .ha{display:flex;gap:4px}
 .ibtn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:3px 5px;border-radius:4px;font-size:12px;transition:color .13s}
 .ibtn:hover{color:var(--text)}.ibtn.del:hover{color:var(--red)}
 .empty-hist{text-align:center;padding:1.5rem;color:var(--muted);font-family:var(--mono);font-size:.75rem}
+
+/* ── INBOX ── */
 .inbox-panel{display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;min-height:500px}
 .inbox-toolbar{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.4rem;border-bottom:1px solid var(--b1);background:var(--s2);gap:12px}
 .iaddr{font-family:var(--mono);font-size:.78rem;color:var(--accent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
@@ -147,286 +153,429 @@ footer{position:relative;z-index:1;border-top:1px solid var(--b1);padding:.8rem 
 </head>
 <body>
 
-<!-- ── AUTH PAGE ── -->
-<div id="authPage">
-  <div class="auth-box">
-    <div class="auth-logo"><div class="auth-logo-dot"></div>Drop<em>Mail</em></div>
-    <div class="auth-sub">@exiled.lat — your private inbox</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
-      <button class="auth-tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
+<!-- ── AUTH MODAL ── -->
+<div class="overlay" id="authOverlay">
+  <div class="modal">
+    <div class="modal-logo"><div class="logo-dot-sm"></div>Drop<em>Mail</em></div>
+    <div class="modal-sub" id="authSub">@exiled.lat — your private inbox</div>
+    <div class="tabs" id="authTabs">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+      <button class="tab" id="tabSignup" onclick="switchTab('signup')">Create Account</button>
     </div>
-    <div class="auth-field">
+    <div class="field">
       <label>Email</label>
-      <input class="auth-input" id="authEmail" type="email" placeholder="you@example.com" autocomplete="email">
+      <input class="inp" id="authEmail" type="email" placeholder="you@example.com" autocomplete="email">
     </div>
-    <div class="auth-field">
+    <div class="field">
       <label>Password</label>
-      <input class="auth-input" id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+      <input class="inp" id="authPass" type="password" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <div class="auth-err" id="authErr"></div>
-    <button class="auth-btn" id="authBtn" onclick="handleAuth()">Sign In</button>
-    <div class="auth-ok" id="authOk"></div>
+    <div class="merr" id="authErr"></div>
+    <button class="modal-btn" id="authBtn" onclick="handleAuth()">Sign In</button>
+    <div class="mok" id="authOk"></div>
+  </div>
+</div>
+
+<!-- ── CLAIM MODAL ── -->
+<div class="overlay hidden" id="claimOverlay">
+  <div class="modal">
+    <div class="modal-logo"><div class="logo-dot-sm"></div>Claim Inbox</div>
+    <div class="modal-sub" id="claimAddrLabel"></div>
+    <div class="claim-badge">⚡ This inbox has no owner yet — claim it with a password and it's yours forever.</div>
+    <div class="field">
+      <label>Set a password</label>
+      <input class="inp" id="claimPass" type="password" placeholder="min 6 characters">
+    </div>
+    <div class="field">
+      <label>Confirm password</label>
+      <input class="inp" id="claimPass2" type="password" placeholder="repeat password">
+    </div>
+    <div class="merr" id="claimErr"></div>
+    <button class="modal-btn" id="claimBtn" onclick="handleClaim()">🔒 Claim This Inbox</button>
+    <button class="modal-btn ghost" onclick="closeClaim()">Cancel</button>
+  </div>
+</div>
+
+<!-- ── UNLOCK MODAL ── -->
+<div class="overlay hidden" id="unlockOverlay">
+  <div class="modal">
+    <div class="modal-logo"><div class="logo-dot-sm"></div>Private Inbox</div>
+    <div class="modal-sub" id="unlockAddrLabel"></div>
+    <div class="claimed-badge">🔒 This inbox is claimed — enter the password to access it.</div>
+    <div class="field">
+      <label>Password</label>
+      <input class="inp" id="unlockPass" type="password" placeholder="••••••••">
+    </div>
+    <div class="merr" id="unlockErr"></div>
+    <button class="modal-btn" id="unlockBtn" onclick="handleUnlock()">Unlock Inbox</button>
+    <button class="modal-btn ghost" onclick="closeUnlock()">Cancel</button>
   </div>
 </div>
 
 <!-- ── MAIN APP ── -->
-<div id="appPage">
-  <header>
-    <div class="logo"><div class="logo-dot"></div>Drop<em>Mail</em></div>
-    <div class="hdr-right">
-      <span class="domain-badge">@exiled.lat</span>
-      <span class="user-pill" id="userPill"></span>
-      <div id="liveDot"></div>
-      <span id="liveLabel">offline</span>
-      <button class="logout-btn" onclick="logout()">sign out</button>
-    </div>
-  </header>
+<header>
+  <div class="logo"><div class="logo-dot"></div>Drop<em>Mail</em></div>
+  <div class="hdr-right">
+    <span class="domain-badge">@exiled.lat</span>
+    <span class="user-pill" id="userPill"></span>
+    <div id="liveDot"></div>
+    <span id="liveLabel">offline</span>
+    <button class="signout-btn" onclick="logout()">sign out</button>
+  </div>
+</header>
 
-  <div class="layout">
-    <div class="left">
-      <div class="card">
-        <div class="card-label">// create inbox</div>
-        <div class="input-row">
-          <input class="gen-input" id="usernameInput" placeholder="username" maxlength="40" oninput="this.value=this.value.replace(/[^a-z0-9._-]/gi,'').toLowerCase()">
-          <div class="domain-suffix">@exiled.lat</div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-gen" onclick="generateAddress()"><span id="genIcon">⚡</span> Generate Random</button>
-          <button class="btn btn-ghost" onclick="useCustom()">✓ Use</button>
-        </div>
-        <div class="cur-addr" id="addrBox">
-          <span class="cur-addr-text ph" id="addrText">No inbox selected</span>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-ghost" id="copyBtn" onclick="copyAddr()" disabled>📋 Copy</button>
-        </div>
-        <div class="status" id="status"></div>
+<div class="layout">
+  <div class="left">
+    <div class="card">
+      <div class="card-label">// create inbox</div>
+      <div class="input-row">
+        <input class="gen-input" id="usernameInput" placeholder="username" maxlength="40" oninput="this.value=this.value.replace(/[^a-z0-9._-]/gi,'').toLowerCase()">
+        <div class="domain-suffix">@exiled.lat</div>
       </div>
-      <div class="hist-card">
-        <div class="sec-header">
-          <span class="sec-title">// my inboxes</span>
-          <span class="pill" id="histCount">0</span>
-        </div>
-        <div class="hist-list" id="histList"><div class="empty-hist">no inboxes yet</div></div>
+      <div class="btn-row">
+        <button class="btn btn-gen" onclick="generateAddress()"><span id="genIcon">⚡</span> Generate Random</button>
+        <button class="btn btn-ghost" onclick="useCustom()">✓ Use</button>
       </div>
+      <div class="cur-addr" id="addrBox">
+        <span class="cur-addr-text ph" id="addrText">No inbox selected</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="copyBtn" onclick="copyAddr()" disabled>📋 Copy</button>
+      </div>
+      <div class="appstatus" id="appStatus"></div>
     </div>
-
-    <div class="inbox-panel">
-      <div class="inbox-toolbar">
-        <div class="iaddr ph" id="iAddr">select or create an inbox</div>
-        <div class="itoolbar-r">
-          <span class="imeta" id="iMeta"></span>
-          <button class="rbtn" id="refreshBtn" onclick="refreshInbox()" disabled><span id="refreshIcon">↻</span> refresh</button>
-        </div>
+    <div class="hist-card">
+      <div class="sec-header">
+        <span class="sec-title">// all inboxes</span>
+        <span class="pill" id="histCount">0</span>
       </div>
-      <div class="inbox-body" id="inboxBody">
-        <div class="iplaceholder">
-          <div class="bigicon">📬</div>
-          <h3>Your inbox will appear here</h3>
-          <p>Create an address above — any email sent to <strong style="color:var(--accent)">anything@exiled.lat</strong> will show up here instantly.</p>
-        </div>
-      </div>
-      <div class="edetail" id="eDetail">
-        <div class="dheader">
-          <button class="dback" onclick="closeDetail()">← inbox</button>
-          <div class="dsubj" id="dSubj"></div>
-          <div class="dmeta" id="dMeta"></div>
-        </div>
-        <div class="dbody" id="dBody"></div>
-      </div>
+      <div class="hist-list" id="histList"><div class="empty-hist">no inboxes yet</div></div>
     </div>
   </div>
 
-  <footer>
-    <span>DropMail — exiled.lat via Mailgun + Supabase</span>
-    <span id="footerStats">0 inboxes saved</span>
-  </footer>
+  <div class="inbox-panel">
+    <div class="inbox-toolbar">
+      <div class="iaddr ph" id="iAddr">select or create an inbox</div>
+      <div class="itoolbar-r">
+        <span class="imeta" id="iMeta"></span>
+        <button class="rbtn" id="refreshBtn" onclick="refreshInbox()" disabled><span id="refreshIcon">↻</span> refresh</button>
+      </div>
+    </div>
+    <div class="inbox-body" id="inboxBody">
+      <div class="iplaceholder">
+        <div class="bigicon">📬</div>
+        <h3>Your inbox will appear here</h3>
+        <p>Create or select an inbox. Any email to <strong style="color:var(--accent)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0f6e61767b676661684f6a7766636a6b21636e7b">[email&#160;protected]</a></strong> lands here instantly.</p>
+      </div>
+    </div>
+    <div class="edetail" id="eDetail">
+      <div class="dheader">
+        <button class="dback" onclick="closeDetail()">← inbox</button>
+        <div class="dsubj" id="dSubj"></div>
+        <div class="dmeta" id="dMeta"></div>
+      </div>
+      <div class="dbody" id="dBody"></div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
+<footer>
+  <span>DropMail — exiled.lat via Mailgun + Supabase</span>
+  <span id="footerStats"></span>
+</footer>
 
-<script>
-const SUPABASE_URL = 'https://ylgtgecqhdhakzbjdkqq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_ILF6pER_bdL8GppxOzfumg_xsDoMA6T';
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const SUPABASE_URL = 'https://yoatzybpfmdnlfhifnzs.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_o0Vdbv8HjqNluwkijys-Sw_lBBN5OjP';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 const ADDR_TABLE = 'dropmail_addresses';
 const MSG_TABLE  = 'dropmail_messages';
 const DOMAIN     = 'exiled.lat';
 
-let active = null;
-let pollTimer = null;
-let allAccounts = [];
-let currentMsgs = [];
-let currentUser = null;
+let active       = null;  // currently viewed email address string
+let activeRecord = null;  // full DB row
+let pollTimer    = null;
+let allAccounts  = [];
+let currentMsgs  = [];
+let currentUser  = null;
+let pendingAddr  = null;  // address being claimed/unlocked
 
-// ── AUTH ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════════════
 let authMode = 'login';
-
 function switchTab(mode) {
   authMode = mode;
-  document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
-  document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
-  document.getElementById('authBtn').textContent = mode === 'login' ? 'Sign In' : 'Create Account';
+  document.getElementById('tabLogin').classList.toggle('active', mode==='login');
+  document.getElementById('tabSignup').classList.toggle('active', mode==='signup');
+  document.getElementById('authBtn').textContent = mode==='login' ? 'Sign In' : 'Create Account';
   document.getElementById('authErr').textContent = '';
   document.getElementById('authOk').textContent = '';
 }
 
 async function handleAuth() {
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value;
-  const btn = document.getElementById('authBtn');
-  const errEl = document.getElementById('authErr');
-  const okEl = document.getElementById('authOk');
-
-  errEl.textContent = '';
-  okEl.textContent = '';
-
+  var email    = document.getElementById('authEmail').value.trim();
+  var password = document.getElementById('authPass').value;
+  var btn      = document.getElementById('authBtn');
+  var errEl    = document.getElementById('authErr');
+  var okEl     = document.getElementById('authOk');
+  errEl.textContent = ''; okEl.textContent = '';
   if (!email || !password) { errEl.textContent = 'Fill in both fields'; return; }
   if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
-
-  btn.disabled = true;
-  btn.textContent = 'Please wait…';
-
+  btn.disabled = true; btn.textContent = 'Please wait…';
   if (authMode === 'signup') {
-    const { data, error } = await db.auth.signUp({ email, password });
-    if (error) {
-      errEl.textContent = error.message;
-    } else if (data.user && !data.session) {
+    var r = await db.auth.signUp({ email, password, options:{ data:{ email } } });
+    if (r.error) {
+      errEl.textContent = r.error.message.includes('Database') ? 'Signup failed — try signing in if you already have an account.' : r.error.message;
+    } else if (r.data.user && !r.data.session) {
       okEl.textContent = 'Check your email to confirm your account!';
-    } else {
-      onLogin(data.user);
+    } else if (r.data.user) {
+      onLogin(r.data.user);
     }
   } else {
-    const { data, error } = await db.auth.signInWithPassword({ email, password });
-    if (error) {
-      errEl.textContent = error.message;
+    var r2 = await db.auth.signInWithPassword({ email, password });
+    if (r2.error) {
+      errEl.textContent = r2.error.message.includes('Invalid') ? 'Wrong email or password.' : r2.error.message;
     } else {
-      onLogin(data.user);
+      onLogin(r2.data.user);
     }
   }
-
   btn.disabled = false;
-  btn.textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
+  btn.textContent = authMode==='login' ? 'Sign In' : 'Create Account';
 }
 
-// allow pressing Enter to submit
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && document.getElementById('authPage').style.display !== 'none' &&
-      !document.getElementById('authBtn').disabled) {
-    handleAuth();
-  }
+  if (e.key !== 'Enter') return;
+  if (!document.getElementById('authOverlay').classList.contains('hidden') && !document.getElementById('authBtn').disabled) handleAuth();
+  if (!document.getElementById('claimOverlay').classList.contains('hidden')) handleClaim();
+  if (!document.getElementById('unlockOverlay').classList.contains('hidden')) handleUnlock();
 });
 
 function onLogin(user) {
   currentUser = user;
-  document.getElementById('authPage').style.display = 'none';
-  document.getElementById('appPage').classList.add('show');
+  document.getElementById('authOverlay').classList.add('hidden');
   document.getElementById('userPill').textContent = user.email;
   init();
 }
 
 async function logout() {
   await db.auth.signOut();
-  currentUser = null;
-  active = null;
-  stopPoll();
-  allAccounts = [];
-  currentMsgs = [];
-  document.getElementById('appPage').classList.remove('show');
-  document.getElementById('authPage').style.display = 'flex';
+  currentUser = null; active = null; activeRecord = null;
+  stopPoll(); allAccounts = []; currentMsgs = [];
+  document.getElementById('authOverlay').classList.remove('hidden');
   document.getElementById('authEmail').value = '';
-  document.getElementById('authPassword').value = '';
+  document.getElementById('authPass').value = '';
   document.getElementById('authErr').textContent = '';
   document.getElementById('authOk').textContent = '';
   resetInbox();
 }
 
-// ── Supabase: addresses (per user) ───────────────────
-async function dbLoadAddresses() {
-  const { data, error } = await db.from(ADDR_TABLE)
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .order('created_at', { ascending: false });
-  if (error) { console.error(error); return []; }
-  return data || [];
+// ══════════════════════════════════════════════════════
+//  SUPABASE: ADDRESSES
+//  Schema: id, email, owner_id (uuid, nullable), 
+//          password_hash (text, nullable), created_at
+// ══════════════════════════════════════════════════════
+async function dbGetAddress(email) {
+  var r = await db.from(ADDR_TABLE).select('*').eq('email', email).single();
+  return r.data || null;
 }
-async function dbSaveAddress(email) {
-  const { data } = await db.from(ADDR_TABLE).select('id').eq('email', email).eq('user_id', currentUser.id).single();
-  if (data) return;
-  const { error } = await db.from(ADDR_TABLE).insert([{ email, token: '', account_id: DOMAIN, user_id: currentUser.id }]);
-  if (error && error.code !== '23505') console.error(error);
+async function dbCreateAddress(email) {
+  // Create unclaimed address (no owner, no password)
+  var existing = await dbGetAddress(email);
+  if (existing) return existing;
+  var r = await db.from(ADDR_TABLE).insert([{ email, owner_id: null, password_hash: null }]).select().single();
+  return r.data;
 }
-async function dbDelAddress(email) {
-  await db.from(ADDR_TABLE).delete().eq('email', email).eq('user_id', currentUser.id);
+async function dbLoadAllAddresses() {
+  var r = await db.from(ADDR_TABLE).select('*').order('created_at', { ascending: false });
+  return r.data || [];
+}
+async function dbClaimAddress(email, passwordHash) {
+  // Claim: set owner_id to current user, store password hash
+  var r = await db.from(ADDR_TABLE).update({ owner_id: currentUser.id, password_hash: passwordHash }).eq('email', email).eq('owner_id', null).select().single();
+  return r.data;
+}
+async function dbDeleteAddress(email) {
+  await db.from(ADDR_TABLE).delete().eq('email', email).eq('owner_id', currentUser.id);
 }
 
-// ── Supabase: messages ────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  SUPABASE: MESSAGES
+// ══════════════════════════════════════════════════════
 async function dbLoadMessages(toAddress) {
-  const { data, error } = await db.from(MSG_TABLE)
-    .select('*')
-    .eq('to_address', toAddress.toLowerCase())
-    .order('received_at', { ascending: false });
-  if (error) { console.error(error); return []; }
-  return data || [];
+  var r = await db.from(MSG_TABLE).select('*').eq('to_address', toAddress.toLowerCase()).order('received_at', { ascending: false });
+  return r.data || [];
 }
 async function dbMarkSeen(id) {
   await db.from(MSG_TABLE).update({ seen: true }).eq('id', id);
 }
 
-// ── Generate / use address ────────────────────────────
+// ══════════════════════════════════════════════════════
+//  PASSWORD HASHING (simple SHA-256 via Web Crypto)
+// ══════════════════════════════════════════════════════
+async function hashPassword(password) {
+  var enc = new TextEncoder().encode(password + 'dropmail_salt_exiled');
+  var buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  CLAIM FLOW
+// ══════════════════════════════════════════════════════
+function openClaim(email) {
+  pendingAddr = email;
+  document.getElementById('claimAddrLabel').textContent = email;
+  document.getElementById('claimPass').value = '';
+  document.getElementById('claimPass2').value = '';
+  document.getElementById('claimErr').textContent = '';
+  document.getElementById('claimOverlay').classList.remove('hidden');
+  setTimeout(function(){ document.getElementById('claimPass').focus(); }, 100);
+}
+function closeClaim() {
+  document.getElementById('claimOverlay').classList.add('hidden');
+  pendingAddr = null;
+}
+async function handleClaim() {
+  var p1  = document.getElementById('claimPass').value;
+  var p2  = document.getElementById('claimPass2').value;
+  var err = document.getElementById('claimErr');
+  var btn = document.getElementById('claimBtn');
+  err.textContent = '';
+  if (p1.length < 6) { err.textContent = 'Password must be at least 6 characters'; return; }
+  if (p1 !== p2)     { err.textContent = 'Passwords do not match'; return; }
+  btn.disabled = true; btn.textContent = 'Claiming…';
+  var hash = await hashPassword(p1);
+  var result = await dbClaimAddress(pendingAddr, hash);
+  btn.disabled = false; btn.textContent = '🔒 Claim This Inbox';
+  if (!result) {
+    err.textContent = 'Someone else just claimed this inbox — refresh and try another.';
+    return;
+  }
+  // Save unlock in session so we don't re-ask this session
+  sessionStorage.setItem('unlocked_' + pendingAddr, '1');
+  closeClaim();
+  showToast('🎉 Inbox claimed! It\'s yours.');
+  await loadHistory();
+  setActive(pendingAddr);
+}
+
+// ══════════════════════════════════════════════════════
+//  UNLOCK FLOW
+// ══════════════════════════════════════════════════════
+function openUnlock(email) {
+  pendingAddr = email;
+  document.getElementById('unlockAddrLabel').textContent = email;
+  document.getElementById('unlockPass').value = '';
+  document.getElementById('unlockErr').textContent = '';
+  document.getElementById('unlockOverlay').classList.remove('hidden');
+  setTimeout(function(){ document.getElementById('unlockPass').focus(); }, 100);
+}
+function closeUnlock() {
+  document.getElementById('unlockOverlay').classList.add('hidden');
+  pendingAddr = null;
+}
+async function handleUnlock() {
+  var p   = document.getElementById('unlockPass').value;
+  var err = document.getElementById('unlockErr');
+  var btn = document.getElementById('unlockBtn');
+  err.textContent = '';
+  if (!p) { err.textContent = 'Enter the password'; return; }
+  btn.disabled = true; btn.textContent = 'Checking…';
+  var hash = await hashPassword(p);
+  var rec  = await dbGetAddress(pendingAddr);
+  btn.disabled = false; btn.textContent = 'Unlock Inbox';
+  if (!rec || rec.password_hash !== hash) {
+    err.textContent = 'Wrong password';
+    return;
+  }
+  sessionStorage.setItem('unlocked_' + pendingAddr, '1');
+  closeUnlock();
+  showToast('Inbox unlocked!');
+  setActive(pendingAddr);
+}
+
+// ══════════════════════════════════════════════════════
+//  GENERATE / USE ADDRESS
+// ══════════════════════════════════════════════════════
 function generateAddress() {
   var adjs  = ['cozy','swift','fuzzy','lucky','sunny','brave','witty','calm','merry','jolly','silent','clever','noble','vivid','peppy','zippy','funky','shiny'];
   var nouns = ['tiger','panda','falcon','river','pebble','ember','cloud','spark','maple','cedar','orbit','pixel','quill','raven','stone','brook','flame','comet'];
-  var user = adjs[Math.floor(Math.random()*adjs.length)] + nouns[Math.floor(Math.random()*nouns.length)] + (Math.floor(Math.random()*9000)+100);
+  var user = adjs[~~(Math.random()*adjs.length)] + nouns[~~(Math.random()*nouns.length)] + (~~(Math.random()*9000)+100);
   document.getElementById('usernameInput').value = user;
   activateAddress(user + '@' + DOMAIN);
 }
 function useCustom() {
   var val = document.getElementById('usernameInput').value.trim();
-  if (!val) { setStatus('Enter a username first', 'err'); return; }
+  if (!val) { setAppStatus('Enter a username first', 'err'); return; }
   activateAddress(val + '@' + DOMAIN);
 }
 async function activateAddress(email) {
-  await dbSaveAddress(email);
-  setActive(email);
-  setStatus('✓ Inbox ready — share this address!', 'ok');
-  showToast('Inbox ready!');
-  await loadHistory();
+  var rec = await dbGetAddress(email);
+  if (!rec) {
+    // Brand new address — create unclaimed
+    rec = await dbCreateAddress(email);
+    showToast('New inbox created!');
+    await loadHistory();
+  }
+  // Check if claimed
+  if (rec && rec.owner_id) {
+    // Owned by someone — need to unlock unless already unlocked this session
+    if (sessionStorage.getItem('unlocked_' + email)) {
+      setActive(email);
+    } else {
+      openUnlock(email);
+    }
+  } else {
+    // Unclaimed — just open it
+    setActive(email);
+    await loadHistory();
+  }
 }
 
-// ── History ───────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  HISTORY
+// ══════════════════════════════════════════════════════
 async function loadHistory() {
-  allAccounts = await dbLoadAddresses();
+  allAccounts = await dbLoadAllAddresses();
   renderHistory();
-  document.getElementById('footerStats').textContent = allAccounts.length + ' inbox' + (allAccounts.length !== 1 ? 'es' : '') + ' saved';
+  document.getElementById('footerStats').textContent = allAccounts.length + ' inbox' + (allAccounts.length!==1?'es':'') + ' — ' + allAccounts.filter(function(a){return a.owner_id;}).length + ' claimed';
 }
 function renderHistory() {
   var list = document.getElementById('histList');
   document.getElementById('histCount').textContent = allAccounts.length;
   if (!allAccounts.length) { list.innerHTML = '<div class="empty-hist">no inboxes yet</div>'; return; }
   list.innerHTML = allAccounts.map(function(a) {
-    return '<div class="hist-item ' + (active === a.email ? 'sel' : '') + '" onclick="setActive(\'' + esc(a.email) + '\')">' +
+    var isClaimed = !!a.owner_id;
+    var isMine    = isClaimed && a.owner_id === currentUser.id;
+    var lock      = isClaimed ? (isMine ? '🔒' : '🔐') : '🔓';
+    var sel       = active === a.email ? 'sel' : '';
+    return '<div class="hist-item ' + sel + '" onclick="activateAddress(\'' + esc(a.email) + '\')">' +
+      '<span class="hist-lock">' + lock + '</span>' +
       '<span class="hist-addr">' + esc(a.email) + '</span>' +
       '<div class="ha">' +
       '<button class="ibtn" onclick="event.stopPropagation();copySpec(\'' + esc(a.email) + '\')" title="Copy">📋</button>' +
-      '<button class="ibtn del" onclick="event.stopPropagation();delAddress(\'' + esc(a.email) + '\')" title="Delete">🗑</button>' +
+      ((!isClaimed) ? '<button class="ibtn" onclick="event.stopPropagation();openClaim(\'' + esc(a.email) + '\')" title="Claim">⚡</button>' : '') +
+      (isMine ? '<button class="ibtn del" onclick="event.stopPropagation();deleteAddr(\'' + esc(a.email) + '\')" title="Delete">🗑</button>' : '') +
       '</div></div>';
   }).join('');
 }
-async function delAddress(email) {
-  await dbDelAddress(email);
+async function deleteAddr(email) {
+  if (!confirm('Delete ' + email + '? This cannot be undone.')) return;
+  await dbDeleteAddress(email);
   if (active === email) { active = null; stopPoll(); resetInbox(); }
   await loadHistory();
   showToast('Deleted');
 }
 
-// ── Active inbox ──────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  ACTIVE INBOX
+// ══════════════════════════════════════════════════════
 function setActive(email) {
   stopPoll();
   active = email;
-  localStorage.setItem('dropmail_active_' + currentUser.id, email);
+  localStorage.setItem('dm_active_' + currentUser.id, email);
   document.getElementById('addrBox').classList.add('active');
   document.getElementById('addrText').textContent = email;
   document.getElementById('addrText').classList.remove('ph');
@@ -439,62 +588,60 @@ function setActive(email) {
   startPoll();
   renderHistory();
 }
+
 async function refreshInbox() {
   if (!active) return;
   var rbtn = document.getElementById('refreshBtn');
   var icon = document.getElementById('refreshIcon');
-  rbtn.disabled = true;
-  icon.classList.add('spin');
+  rbtn.disabled = true; icon.classList.add('spin');
   try {
-    var msgs = await dbLoadMessages(active);
-    currentMsgs = msgs;
-    renderMsgs(msgs);
-  } catch(e) {
-    setStatus('Error: ' + e.message, 'err');
-  } finally {
-    rbtn.disabled = false;
-    icon.classList.remove('spin');
-  }
+    currentMsgs = await dbLoadMessages(active);
+    renderMsgs(currentMsgs);
+  } catch(e) { setAppStatus('Error: ' + e.message, 'err'); }
+  finally { rbtn.disabled = false; icon.classList.remove('spin'); }
 }
+
 function renderMsgs(msgs) {
-  var body = document.getElementById('inboxBody');
-  var unread = msgs.filter(function(m) { return !m.seen; }).length;
+  var body   = document.getElementById('inboxBody');
+  var unread = msgs.filter(function(m){ return !m.seen; }).length;
   document.getElementById('iMeta').textContent = msgs.length
-    ? msgs.length + ' msg' + (msgs.length !== 1 ? 's' : '') + (unread ? ' · ' + unread + ' new' : '')
+    ? msgs.length + ' msg' + (msgs.length!==1?'s':'') + (unread?' · '+unread+' new':'')
     : 'empty';
   if (!msgs.length) {
-    body.innerHTML = '<div class="iplaceholder"><div class="bigicon">📭</div><h3>Inbox is empty</h3><p>Send any email to <strong style="color:var(--accent);font-family:var(--mono);font-size:.8rem">' + esc(active) + '</strong> and it\'ll appear here within seconds.</p></div>';
+    body.innerHTML = '<div class="iplaceholder"><div class="bigicon">📭</div><h3>Inbox is empty</h3>' +
+      '<p>Send any email to <strong style="color:var(--accent);font-family:var(--mono);font-size:.8rem">' + esc(active) + '</strong> and it\'ll appear here within seconds.</p></div>';
     return;
   }
   body.innerHTML = '<div class="msg-list">' + msgs.map(function(m) {
-    var from = m.from_address || 'unknown';
+    var from     = m.from_address || 'unknown';
     var initials = from.replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase() || '??';
-    return '<div class="msg-item ' + (!m.seen ? 'unread' : '') + '" onclick="openMsg(\'' + m.id + '\')">' +
+    return '<div class="msg-item ' + (!m.seen?'unread':'') + '" onclick="openMsg(\'' + m.id + '\')">' +
       '<div class="mavatar">' + initials + '</div>' +
       '<div class="mcontent">' +
       '<div class="mfrom">' + esc(from) + '</div>' +
-      '<div class="msubj">' + esc(m.subject || '(no subject)') + '</div>' +
-      '<div class="mprev">' + esc((m.body_text || '').slice(0,80)) + '</div>' +
+      '<div class="msubj">' + esc(m.subject||'(no subject)') + '</div>' +
+      '<div class="mprev">' + esc((m.body_text||'').slice(0,80)) + '</div>' +
       '</div><div class="mtime">' + fmtTime(m.received_at) + '</div></div>';
   }).join('') + '</div>';
 }
+
 async function openMsg(id) {
-  var msg = currentMsgs.find(function(m) { return m.id === id; });
+  var msg = currentMsgs.find(function(m){ return m.id===id; });
   if (!msg) return;
   await dbMarkSeen(id);
-  currentMsgs = currentMsgs.map(function(m) { return m.id === id ? Object.assign({}, m, {seen:true}) : m; });
+  currentMsgs = currentMsgs.map(function(m){ return m.id===id ? Object.assign({},m,{seen:true}) : m; });
   document.getElementById('dSubj').textContent = msg.subject || '(no subject)';
   document.getElementById('dMeta').innerHTML =
-    'From: <span>' + esc(msg.from_address||'') + '</span><br>' +
-    'To: <span>' + esc(msg.to_address||'') + '</span><br>' +
-    'Date: <span>' + new Date(msg.received_at).toLocaleString() + '</span>';
-  var txt = msg.body_text || stripHtml(msg.body_html || '') || '(empty message)';
-  var patterns = [/\b(\d{6})\b/, /\b(\d{4,8})\b/, /\b([A-Z0-9]{6,10})\b/];
+    'From: <span>'+esc(msg.from_address||'')+'</span><br>'+
+    'To: <span>'+esc(msg.to_address||'')+'</span><br>'+
+    'Date: <span>'+new Date(msg.received_at).toLocaleString()+'</span>';
+  var txt = msg.body_text || stripHtml(msg.body_html||'') || '(empty message)';
   var code = null;
-  for (var i = 0; i < patterns.length; i++) { var m = txt.match(patterns[i]); if (m) { code = m[1]; break; } }
+  var pats = [/\b(\d{6})\b/, /\b(\d{4,8})\b/, /\b([A-Z0-9]{6,10})\b/];
+  for (var i=0;i<pats.length;i++){ var mm=txt.match(pats[i]); if(mm){code=mm[1];break;} }
   var html = '';
-  if (code) html += '<div class="code-label">// verification code — click to copy</div><div class="code-box" onclick="copySpec(\'' + esc(code) + '\');showToast(\'Code copied!\')">' + esc(code) + '</div><br>';
-  html += '<div class="email-frame">' + esc(txt) + '</div>';
+  if (code) html += '<div class="code-label">// verification code — click to copy</div><div class="code-box" onclick="copySpec(\''+esc(code)+'\');showToast(\'Code copied!\')">'+esc(code)+'</div><br>';
+  html += '<div class="email-frame">'+esc(txt)+'</div>';
   document.getElementById('dBody').innerHTML = html;
   document.getElementById('inboxBody').style.display = 'none';
   document.getElementById('eDetail').classList.add('open');
@@ -505,9 +652,11 @@ function closeDetail() {
   renderMsgs(currentMsgs);
 }
 
-// ── Realtime ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  REALTIME + POLL
+// ══════════════════════════════════════════════════════
 function subscribeRealtime() {
-  db.channel('msgs_' + currentUser.id).on('postgres_changes',
+  db.channel('dm_' + currentUser.id).on('postgres_changes',
     { event: 'INSERT', schema: 'public', table: MSG_TABLE },
     function(payload) {
       if (active && payload.new.to_address === active.toLowerCase()) {
@@ -518,20 +667,14 @@ function subscribeRealtime() {
     }
   ).subscribe();
 }
-
-// ── Poll ──────────────────────────────────────────────
-function startPoll() {
-  pollTimer = setInterval(function() {
-    if (active && !document.getElementById('eDetail').classList.contains('open')) refreshInbox();
-  }, 8000);
-}
-function stopPoll() { clearInterval(pollTimer); pollTimer = null; }
+function startPoll() { pollTimer = setInterval(function(){ if(active && !document.getElementById('eDetail').classList.contains('open')) refreshInbox(); }, 8000); }
+function stopPoll()  { clearInterval(pollTimer); pollTimer = null; }
 function resetInbox() {
   document.getElementById('iAddr').textContent = 'select or create an inbox';
   document.getElementById('iAddr').classList.add('ph');
   document.getElementById('refreshBtn').disabled = true;
   document.getElementById('iMeta').textContent = '';
-  document.getElementById('inboxBody').innerHTML = '<div class="iplaceholder"><div class="bigicon">📬</div><h3>Your inbox will appear here</h3><p>Create an address above.</p></div>';
+  document.getElementById('inboxBody').innerHTML = '<div class="iplaceholder"><div class="bigicon">📬</div><h3>Your inbox will appear here</h3><p>Create or select an inbox above.</p></div>';
   document.getElementById('addrBox').classList.remove('active');
   document.getElementById('addrText').textContent = 'No inbox selected';
   document.getElementById('addrText').classList.add('ph');
@@ -539,11 +682,13 @@ function resetInbox() {
   setLive(false);
 }
 
-// ── UI helpers ────────────────────────────────────────
-function setStatus(msg, type) { var e = document.getElementById('status'); e.textContent = msg; e.className = 'status '+(type||''); }
-function setLive(on) { document.getElementById('liveDot').className = on?'live':''; document.getElementById('liveLabel').textContent = on?'live':'offline'; }
-function copyAddr() { if (active) copySpec(active); }
-function copySpec(v) { navigator.clipboard.writeText(v).then(function() { showToast('Copied!'); }); }
+// ══════════════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════════════
+function setAppStatus(msg, type) { var e=document.getElementById('appStatus'); e.textContent=msg; e.className='appstatus '+(type||''); }
+function setLive(on) { document.getElementById('liveDot').className=on?'live':''; document.getElementById('liveLabel').textContent=on?'live':'offline'; }
+function copyAddr() { if(active) copySpec(active); }
+function copySpec(v) { navigator.clipboard.writeText(v).then(function(){ showToast('Copied!'); }); }
 function showToast(msg) { var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2500); }
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function stripHtml(h) { return h.replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
@@ -552,37 +697,26 @@ function fmtTime(iso) {
   var d=new Date(iso),now=new Date(),diff=now-d;
   if (isNaN(diff)) return iso;
   if (diff<60000) return 'just now';
-  if (diff<3600000) return Math.floor(diff/60000)+'m ago';
-  if (diff<86400000) return Math.floor(diff/3600000)+'h ago';
+  if (diff<3600000) return ~~(diff/60000)+'m ago';
+  if (diff<86400000) return ~~(diff/3600000)+'h ago';
   return d.toLocaleDateString();
 }
 
-// ── Init ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
 async function init() {
   await loadHistory();
   subscribeRealtime();
-  // Restore last active inbox for this user
-  var last = localStorage.getItem('dropmail_active_' + currentUser.id);
-  if (last && allAccounts.find(function(a) { return a.email === last; })) {
-    setActive(last);
+  var last = localStorage.getItem('dm_active_' + currentUser.id);
+  if (last && allAccounts.find(function(a){ return a.email===last; })) {
+    await activateAddress(last);
   } else if (allAccounts.length > 0) {
-    setActive(allAccounts[0].email);
+    await activateAddress(allAccounts[0].email);
   }
 }
 
-// ── Boot: check existing session ─────────────────────
+// Boot — check for existing session
 (async function boot() {
-  const { data: { session } } = await db.auth.getSession();
-  if (session && session.user) {
-    onLogin(session.user);
-  }
-  // Listen for auth changes
-  db.auth.onAuthStateChange(function(event, session) {
-    if (event === 'SIGNED_IN' && session) onLogin(session.user);
-    if (event === 'SIGNED_OUT') logout();
-  });
-})();
-</script>
-</body>
-</html>
-
+  var r = await db.auth.getSession();
+ 
