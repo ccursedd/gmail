@@ -233,7 +233,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--b1);padding:.8rem 
       <div class="iplaceholder">
         <div class="bigicon">📬</div>
         <h3>Your inbox will appear here</h3>
-        <p>Create or select an inbox. Any email to <strong style="color:var(--accent)">anything@exiled.lat</strong> lands here instantly.</p>
+        <p>Create or select an inbox. Any email to <strong style="color:var(--accent)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f0919e898498999e97b09588999c9594de9c9184">[email&#160;protected]</a></strong> lands here instantly.</p>
       </div>
     </div>
     <div class="edetail" id="eDetail">
@@ -253,9 +253,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--b1);padding:.8rem 
   <span id="footerStats"></span>
 </footer>
 
-<script>
-const SUPABASE_URL = 'https://yoatzybpfmdnlfhifnzs.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_o0Vdbv8HjqNluwkijys-Sw_lBBN5OjP';
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const SUPABASE_URL = 'https://ctowuaqhclrqacozgeab.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0b3d1YXFoY2xycWFjb3pnZWFiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTg1NTYyOSwiZXhwIjoyMDkxNDMxNjI5fQ.YoOgQZZXSobn0MKvVoGnecHW93kj9eoDCvQTGifnBd0';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 const ADDR_TABLE = 'dropmail_addresses';
@@ -595,13 +595,4 @@ async function init() {
   await loadHistory();
   subscribeRealtime();
   var last = localStorage.getItem('dm_active');
-  if (last && allAccounts.find(function(a){ return a.email===last; })) {
-    await activateAddress(last);
-  } else if (allAccounts.length > 0) {
-    await activateAddress(allAccounts[0].email);
-  }
-}
-init();
-</script>
-</body>
-</html>
+  if
